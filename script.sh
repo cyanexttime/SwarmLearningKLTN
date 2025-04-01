@@ -43,7 +43,7 @@ ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning && mv workspace/mni
 ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning && rm -rf logs/ workspace host{1,2,3,4,5}"
 ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning && docker rm -f sn{1,2,3} swop{1,2,3} swci1"
 ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning && docker rm -f $(docker ps -a | grep 'user-env\|/sl:2' | awk '{print $1}')"
-ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning && docker network rm host-{1,2,3}-net"
+ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning && docker network rm host-{1,2}-net"
 ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning && docker rm helper"
 ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning && docker volume rm sl-cli-lib"
 ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning && docker image rm tensorflow/tensorflow:2.7.1 user-env-tf2.7.0-swop:latest hello-world:latest"
