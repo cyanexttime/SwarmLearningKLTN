@@ -10,7 +10,7 @@ REMOTE_IP3="192.168.120.79"
 # Check for help argument
 if [ "$1" == "-h" ]; then
     echo "1: cic"
-    echo "2: edge"
+    echo "2: mnist_2hosts"
     echo "3: mnist_3host"
     echo "4: mnist_custom"
     echo "5: mnist_lucid"
