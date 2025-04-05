@@ -34,19 +34,19 @@ nodes:
         - attribute:
             aType: KEY
             mType: BIND
-            src: "/opt/hpe/swarm-learning/workspace/mnist/cert/sl-1-key.pem"
+            src: "<PROJECT-CERTS>/sl-1-key.pem"
             tgt: "/swarm-cert/sl-1-key.pem"
             subPath: null
         - attribute:
             aType: CERT
             mType: BIND
-            src: "/opt/hpe/swarm-learning/workspace/mnist/cert/sl-1-cert.pem"
+            src: "<PROJECT-CERTS>/sl-1-cert.pem"
             tgt: "/swarm-cert/sl-1-cert.pem"
             subPath: null
         - attribute:
             aType: CAPATH
             mType: BIND
-            src: "/opt/hpe/swarm-learning/workspace/mnist/cert/ca/capath"
+            src: "<PROJECT-CACERTS>"
             tgt: "/swarm-cert/capath"
             subPath: null
       slhostname: sl1
@@ -54,7 +54,7 @@ nodes:
       slport: 16000
       usrhostname: user1
       privatedata:
-        src: "/opt/hpe/swarm-learning/workspace/mnist"
+        src: "<PROJECT>"
         mType: BIND
       slenvvars: null
       usrenvvars : [SCRATCH_DIR : "user1"]

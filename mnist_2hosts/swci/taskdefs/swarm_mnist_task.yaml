@@ -13,6 +13,6 @@ Body:
     Envvars: ["MODEL_DIR": model, "MAX_EPOCHS": 2, "MIN_PEERS": 2]
     PrivateContent: /tmp/test/
     SharedContent:
-    -   Src: /opt/hpe/swarm-learning/workspace/mnist/model
+    -   Src: <PROJECT-MODEL>
         Tgt: /tmp/test/model
         MType: BIND

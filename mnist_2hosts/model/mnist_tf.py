@@ -42,7 +42,7 @@ import os
 import logging
 
 default_max_epochs = 5
-default_min_peers = 3
+default_min_peers = 2
 
 def load_data():
     """Loads the MNIST dataset.
@@ -74,7 +74,6 @@ def main():
   model.compile(optimizer='adam',
                 loss='sparse_categorical_crossentropy',
                 metrics=['accuracy'])
-  
 
   # Create Swarm callback
 
