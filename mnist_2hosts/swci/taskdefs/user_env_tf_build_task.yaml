@@ -12,7 +12,7 @@ Body:
     BuildSteps:
     - FROM tensorflow/tensorflow:2.7.0
     - ' '
-    - RUN pip3 install --upgrade pip && pip3 install \
+    - RUN pip3 install pip==24.0 && pip3 install \
     - '   keras matplotlib opencv-python pandas protobuf==3.15.6 '
     - ' '
     - RUN mkdir -p /tmp/hpe-swarmcli-pkg
