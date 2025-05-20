@@ -7,7 +7,7 @@ Author: HPESwarm
 Prereq: user_env_tf_build_task
 Outcome: swarm_mnist_task
 Body:
-    Command: model/mnist_tf.py
+    Command: model/GRU_model.py
     Entrypoint: python3
     WorkingDir: /tmp/test
     Envvars: ["DATA_DIR": app-data, "MAX_EPOCHS": 10, "MIN_PEERS": 2]
