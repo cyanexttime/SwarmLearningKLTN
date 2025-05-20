@@ -1,3 +1,4 @@
+import logging
 import pandas as pd
 import numpy as np
 from sklearn.utils import resample
@@ -12,11 +13,25 @@ from sklearn.neighbors import KNeighborsClassifier
 # Import `train_test_split` from `sklearn.model_selection`
 from sklearn.model_selection import train_test_split
 import numpy as np
-import matplotlib.pyplot as plt
 from swarmlearning.tf import SwarmCallback
+import joblib
+import matplotlib.pyplot as plt
+import os
+from sklearn.metrics import confusion_matrix, precision_score, recall_score, f1_score, cohen_kappa_score, accuracy_score
+# Import `StandardScaler` from `sklearn.preprocessing`
+from sklearn.preprocessing import StandardScaler,MinMaxScaler
 #input_size
 # -> CIC-DDoS2019 82
 # -> CIC-IDS2018 78
+
+defaultMaxEpoch = 100
+defaultMinPeers = 2
+
+trainFileName = 'export_dataframe_proc.csv'
+testFileName = 'export_tests_proc.csv'
+valFileName = 'export_vals_proc.csv'
+
+batch_size = 32
 
 def GRU_model(input_size):
    
@@ -53,9 +68,8 @@ def train_test(samples):
 
 # normalize input data
 
-def normalize_data(X_train,X_test):
-    # Import `StandardScaler` from `sklearn.preprocessing`
-    from sklearn.preprocessing import StandardScaler,MinMaxScaler
+def normalize_data(X_train,X_test, X_vals):
+    
     
     # Define the scaler 
     #scaler = StandardScaler().fit(X_train)
@@ -67,7 +81,10 @@ def normalize_data(X_train,X_test):
     # Scale the test set
     X_test = scaler.transform(X_test)
     
-    return X_train, X_test
+    # Scale the validation set
+    X_vals = scaler.transform(X_vals)
+    
+    return X_train, X_test, X_vals
 
 # Reshape data input
 
@@ -81,71 +98,54 @@ def format_2d(df):
     X = np.array(df)
     return np.reshape(X, (X.shape[0], X.shape[1]))
 
-def compile_train(model, X_train, y_train, deep=True, model_name=None):
-    """
-    Compile and train the model, then save it to a models folder.
-    
-    Parameters:
-    -----------
-    model : model object
-        The machine learning model to train
-    X_train : array-like
-        Training data features
-    y_train : array-like
-        Training data target
-    deep : bool, default=True
-        Whether this is a deep learning model requiring compilation
-    model_name : str, default=None
-        Name to use when saving the model. If None, will try to use model's class name.
-    
-    Returns:
-    --------
-    model : trained model object
-    """
-    import os
-    
-    # Create models directory if it doesn't exist
-    if not os.path.exists('models'):
-        os.makedirs('models')
-        print("Created 'models' directory")
-    
+def compile_train(model, X_train, y_train, X_val, y_val, maxEpoch, minPeers, deep=True, model_name=None):
     # Get model name if not provided
     if model_name is None:
         model_name = model.__class__.__name__
     
     if deep:
-        # For deep learning models
         model.compile(loss='binary_crossentropy',
                       optimizer='adam',
                       metrics=['accuracy'])
+        # Swarm learning callback
+        swarm_callback = SwarmCallback(
+            syncFrequency=10,              # Sync after every 10 batches
+            minPeers=minPeers,                    # Minimum number of peers to sync
+            useAdaptiveSync=True,         # Enable adaptive sync
+            val_data=(X_val, y_val),    # Validation data
+            node_weightage=1.0,            # Optional: weight for model averaging
+            adsValBatchSize=batch_size,            # Batch size for validation data
+            mergeMethod='mean',         # Method for model merging
+        )
+        swarm_callback.logger.setLevel(logging.DEBUG)
         
-        history = model.fit(X_train, y_train, epochs=10, batch_size=256, verbose=1)
-        
-        # summarize history for accuracy
-        plt.figure(figsize=(10, 4))
-        plt.subplot(1, 2, 1)
-        plt.plot(history.history['accuracy'])  # Updated from 'acc' to 'accuracy'
-        plt.title('Model Accuracy')
-        plt.ylabel('Accuracy')
-        plt.xlabel('Epoch')
-        plt.legend(['train'], loc='upper left')
-        
-        # summarize history for loss
-        plt.subplot(1, 2, 2)
-        plt.plot(history.history['loss'])
-        plt.title('Model Loss')
-        plt.ylabel('Loss')
-        plt.xlabel('Epoch')
-        plt.legend(['train'], loc='upper left')
-        plt.tight_layout()
-        plt.show()
+        model.fit(X_train, y_train, epochs=maxEpoch, batch_size=batch_size, verbose=1, callbacks=[swarm_callback])
 
-        print(model.metrics_names)
+        # # summarize history for accuracy
+        # plt.figure(figsize=(10, 4))
+        # plt.subplot(1, 2, 1)
+        # plt.plot(history.history['accuracy'])  # Updated from 'acc' to 'accuracy'
+        # plt.title('Model Accuracy')
+        # plt.ylabel('Accuracy')
+        # plt.xlabel('Epoch')
+        # plt.legend(['train'], loc='upper left')
         
-        # Save the deep learning model
-        model_path = os.path.join('models', f"{model_name}.h5")
-        model.save(model_path)
-        print(f"Deep learning model saved to {model_path}")
+        # # summarize history for loss
+        # plt.subplot(1, 2, 2)
+        # plt.plot(history.history['loss'])
+        # plt.title('Model Loss')
+        # plt.ylabel('Loss')
+        # plt.xlabel('Epoch')
+        # plt.legend(['train'], loc='upper left')
+        # plt.tight_layout()
+        # plt.show()
+
+        # print(model.metrics_names)
+        
+        # # Save the deep learning model
+        # model_path = os.path.join('models', f"{model_name}.h5")
+        # model.save(model_path)
+        # print(f"Deep learning model saved to {model_path}")
     
     else:
         # For non-deep learning models
@@ -153,7 +153,6 @@ def compile_train(model, X_train, y_train, deep=True, model_name=None):
         
         # Save the model using joblib
         try:
-            import joblib
             model_path = os.path.join('models', f"{model_name}.joblib")
             joblib.dump(model, model_path)
             print(f"Model saved to {model_path}")
@@ -175,7 +174,6 @@ def testes(model,X_test,y_test,y_pred, deep=True):
     #y_test = formatar2d(y_test)
     #y_pred = formatar2d(y_pred)
     # Import the modules from `sklearn.metrics`
-    from sklearn.metrics import confusion_matrix, precision_score, recall_score, f1_score, cohen_kappa_score, accuracy_score
     # Accuracy 
     acc = accuracy_score(y_test, y_pred)
     print('\nAccuracy')
@@ -250,20 +248,20 @@ def train_samples(input_file):
     print('X_train:',X_train.shape[1])
     return X_train, y_train
 
-def test_samples(input_file):
-    tests = pd.read_csv(input_file, sep=',')
+def val_test_samples(input_file):
+    tests_val = pd.read_csv(input_file, sep=',')
 
     # X_test = np.concatenate((X_test,(tests.iloc[:,0:(tests.shape[1]-1)]).to_numpy())) # testar 33% + dia de testes
     # y_test = np.concatenate((y_test,tests.iloc[:,-1]))
 
-    X_test = tests.iloc[:,0:(tests.shape[1]-1)]                        
-    y_test = tests.iloc[:,-1]
+    X_test_val = tests_val.iloc[:,0:(tests_val.shape[1]-1)]                        
+    y_test_val = tests_val.iloc[:,-1]
 
-    print((y_test.shape))
-    print((X_test.shape))
+    print((y_test_val.shape))
+    print((X_test_val.shape))
 
     # X_train, X_test = normalize_data(X_train,X_test)
-    return X_test, y_test
+    return X_test_val, y_test_val
 
 def evaluate_model(model, X_test, y_test):
     y_pred = model.predict(format_3d(X_test)) 
@@ -287,16 +285,41 @@ def evaluate_model(model, X_test, y_test):
     return results
 
 def main():
-    train_file = './01-12/export_dataframe_proc.csv'
-    test_file = './01-12/export_tests_proc.csv'
+    modelName = 'GRU'
+    dataDir = os.getenv('DATA_DIR', '/platform/data')
+    scratchDir = os.getenv('SCRATCH_DIR', '/platform/scratch')
+    os.makedirs(scratchDir, exist_ok=True)
+
+    maxEpoch = int(os.getenv('MAX_EPOCHS', str(defaultMaxEpoch)))
+    minPeers = int(os.getenv('MIN_PEERS', str(defaultMinPeers)))
+
+    # train_file = './01-12/export_dataframe_proc.csv'
+    # test_file = './01-12/export_tests_proc.csv'
+    # val_file = './01-12/export_vals_proc.csv'
+    
+    train_file = os.path.join(dataDir, trainFileName)
+    test_file = os.path.join(dataDir, testFileName)
+    val_file = os.path.join(dataDir, valFileName)
+
+
     X_train, y_train = train_samples(train_file)
-    X_test, y_test = test_samples(test_file)
-    X_train, X_test = normalize_data(X_train,X_test)
+    X_test, y_test = val_test_samples(test_file)
+    X_val, y_val = val_test_samples(val_file)
+    X_train, X_test, X_val = normalize_data(X_train, X_test, X_val)
 
-    model_gru = GRU_model(82)
-    model_gru = compile_train(model_gru,format_3d(X_train),y_train,model_name='GRU')
+    print('***** Starting model =', modelName)
+    model_gru = GRU_model(X_train.shape[1])
+    final_model = compile_train(model_gru,format_3d(X_train),y_train, X_val, y_val,maxEpoch, minPeers, model_name='GRU')
 
-    evaluate_model(model_gru, X_test, y_test)
+    # Evaluate the model
+    results = evaluate_model(final_model, X_test, y_test)
+    print('***** Results:')
+    print(results)
 
-main()
+    model_path = os.path.join(scratchDir, modelName)
+    final_model.save(model_path)
+    print('Saved the trained model!')
+
+if __name__ == "__main__":
+    main()
 
