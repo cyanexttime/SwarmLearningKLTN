@@ -161,10 +161,12 @@ case "$1" in
     scenario1)
         # Scenario 1
         ssh ${REMOTE_USER}@${REMOTE_IP1} "cd /opt/hpe/swarm-learning/workspace/mnist && rm -r model"
-        ssh ${REMOTE_USER}@${REMOTE_IP1} "cd SwarmLearningKLTN/cic && cp -r model swop swci /opt/hpe/swarm-learning/workspace/mnist/"
+        ssh ${REMOTE_USER}@${REMOTE_IP1} "cd SwarmLearningKLTN/custom_model && cp -r model swop swci /opt/hpe/swarm-learning/workspace/mnist/"
+        ssh ${REMOTE_USER}@${REMOTE_IP1} "cd /opt/hpe/swarm-learning/ && cp -r custom_dataset /opt/hpe/swarm-learning/workspace/mnist/"
 
         ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning/workspace/mnist && rm -r model"
-        ssh ${REMOTE_USER}@${REMOTE_IP2} "cd SwarmLearningKLTN/cic && cp -r model swop swci /opt/hpe/swarm-learning/workspace/mnist/"
+        ssh ${REMOTE_USER}@${REMOTE_IP2} "cd SwarmLearningKLTN/custom_model && cp -r model swop swci /opt/hpe/swarm-learning/workspace/mnist/"
+        ssh ${REMOTE_USER}@${REMOTE_IP1} "cd /opt/hpe/swarm-learning/ && cp -r custom_dataset /opt/hpe/swarm-learning/workspace/mnist/"
         ;;
     scenario2)
         # Scenario 2
