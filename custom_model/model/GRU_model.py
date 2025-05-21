@@ -95,7 +95,7 @@ def format_3d(df):
 
 def format_2d(df):
     
-    return np.array(df)
+    return np.array(df).flatten()
 
 def compile_train(model, X_train, y_train, X_val, y_val, maxEpoch, minPeers, deep=True, model_name=None):
     # Get model name if not provided
@@ -104,48 +104,52 @@ def compile_train(model, X_train, y_train, X_val, y_val, maxEpoch, minPeers, dee
     
     if deep:
         model.compile(loss='binary_crossentropy',
-                      optimizer='adam',
-                      metrics=['accuracy'])
-        # Swarm learning callback
+                    optimizer='adam',
+                    metrics=['accuracy'])
+        
+        # Prepare validation data specifically for adaptive data sharing
+        # Ensure proper formatting for GRU model
+        X_val_3d = format_3d(X_val)
+        y_val_2d = format_2d(y_val)
+        
+        # Create validation dataset tuple for SwarmCallback
+        Valdata = (X_val_3d, y_val_2d)
+        
+        # Monitor validation metrics during training
+        print(f"Validation data shape for SwarmCallback: X={X_val_3d.shape}, y={y_val_2d.shape}")
+        
+        # Swarm learning callback with proper validation data
         swarm_callback = SwarmCallback(
             syncFrequency=10,              # Sync after every 10 batches
-            minPeers=minPeers,                    # Minimum number of peers to sync
-            useAdaptiveSync=True,         # Enable adaptive sync
-            val_data=(X_val, y_val),    # Validation data
-            node_weightage=1.0,            # Optional: weight for model averaging
-            adsValBatchSize=32,            # Batch size for validation data
-            mergeMethod='mean',         # Method for model merging
+            minPeers=minPeers,             # Minimum number of peers to sync
+            useAdaptiveSync=True,          # Enable adaptive sync
+            adsValData=Valdata,           # Properly formatted validation data
+            node_weightage=1.0,            # Weight for model averaging
+            adsValBatchSize=batch_size,    # Use the global batch_size variable
+            mergeMethod='mean',            # Method for model merging
+            # Add logging to see what's happening during training
+            logDir=os.path.join(os.getenv('SCRATCH_DIR', '/platform/scratch'), 'swarm_logs')
         )
+        
+        # Set logging level for better visibility
         swarm_callback.logger.setLevel(logging.DEBUG)
         
-        model.fit(X_train, y_train, epochs=maxEpoch, batch_size=32, verbose=1, callbacks=[swarm_callback])
-
-        # # summarize history for accuracy
-        # plt.figure(figsize=(10, 4))
-        # plt.subplot(1, 2, 1)
-        # plt.plot(history.history['accuracy'])  # Updated from 'acc' to 'accuracy'
-        # plt.title('Model Accuracy')
-        # plt.ylabel('Accuracy')
-        # plt.xlabel('Epoch')
-        # plt.legend(['train'], loc='upper left')
+        # Format training data properly for GRU model
+        X_train_3d = format_3d(X_train)
+        y_train_2d = format_2d(y_train)
         
-        # # summarize history for loss
-        # plt.subplot(1, 2, 2)
-        # plt.plot(history.history['loss'])
-        # plt.title('Model Loss')
-        # plt.ylabel('Loss')
-        # plt.xlabel('Epoch')
-        # plt.legend(['train'], loc='upper left')
-        # plt.tight_layout()
-        # plt.show()
-
-        # print(model.metrics_names)
+        # Train the model with SwarmCallback
+        history = model.fit(
+            X_train_3d, 
+            y_train_2d, 
+            epochs=maxEpoch, 
+            batch_size=batch_size, 
+            verbose=1,
+            callbacks=[swarm_callback]
+        )
         
-        # # Save the deep learning model
-        # model_path = os.path.join('models', f"{model_name}.h5")
-        # model.save(model_path)
-        # print(f"Deep learning model saved to {model_path}")
-    
+        # Return both model and training history
+        return model, history
     else:
         # For non-deep learning models
         model.fit(X_train, y_train)
