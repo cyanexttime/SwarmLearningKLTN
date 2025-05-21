@@ -24,7 +24,7 @@ from sklearn.preprocessing import StandardScaler,MinMaxScaler
 # -> CIC-DDoS2019 82
 # -> CIC-IDS2018 78
 
-defaultMaxEpoch = 100
+defaultMaxEpoch = 10
 defaultMinPeers = 2
 
 trainFileName = 'export_dataframe_proc.csv'
@@ -114,12 +114,12 @@ def compile_train(model, X_train, y_train, X_val, y_val, maxEpoch, minPeers, dee
             useAdaptiveSync=True,         # Enable adaptive sync
             val_data=(X_val, y_val),    # Validation data
             node_weightage=1.0,            # Optional: weight for model averaging
-            adsValBatchSize=batch_size,            # Batch size for validation data
+            adsValBatchSize=32,            # Batch size for validation data
             mergeMethod='mean',         # Method for model merging
         )
         swarm_callback.logger.setLevel(logging.DEBUG)
         
-        model.fit(X_train, y_train, epochs=maxEpoch, batch_size=batch_size, verbose=1, callbacks=[swarm_callback])
+        model.fit(X_train, y_train, epochs=maxEpoch, batch_size=32, verbose=1, callbacks=[swarm_callback])
 
         # # summarize history for accuracy
         # plt.figure(figsize=(10, 4))
