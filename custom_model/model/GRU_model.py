@@ -307,13 +307,18 @@ def main():
     X_val, y_val = val_test_samples(val_file)
     X_train, X_test, X_val = normalize_data(X_train, X_test, X_val)
 
-    # ✅ Sanity checks
-    if X_train is None or y_train is None or len(X_train) == 0:
-        raise ValueError(f"Training data not loaded properly from {train_file}")
-    if X_val is None or y_val is None or len(X_val) == 0:
-        raise ValueError(f"Validation data not loaded properly from {val_file}")
-    if X_test is None or y_test is None or len(X_test) == 0:
-        raise ValueError(f"Test data not loaded properly from {test_file}")
+     # ✅ Print preview of datasets
+    print(f"\n--- Sample of Training Data ({train_file}) ---")
+    print("X_train:\n", X_train[:3])
+    print("y_train:\n", y_train[:3])
+
+    print(f"\n--- Sample of Validation Data ({val_file}) ---")
+    print("X_val:\n", X_val[:3])
+    print("y_val:\n", y_val[:3])
+
+    print(f"\n--- Sample of Test Data ({test_file}) ---")
+    print("X_test:\n", X_test[:3])
+    print("y_test:\n", y_test[:3])
 
     print('***** Starting model =', modelName)
     model_gru = GRU_model(X_train.shape[1])
