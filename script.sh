@@ -580,8 +580,8 @@ ssh ${REMOTE_USER}@${REMOTE_IP1} "cd /opt/hpe/swarm-learning/ && ./scripts/bin/r
 ## -e http_proxy= -e https_proxy= --apls-ip=${APLS_IP} --apls-port=443
 
 
-ssh ${REMOTE_USER}@${REMOTE_IP1} "cd /opt/hpe/swarm-learning/ && sudo ./scripts/bin/swarmLogCollector "hub.myenterpriselicense.hpe.com/hpe/swarm-learning" "workspace=/opt/hpe/swarm-learning/workspace/mnist" && sudo mv /opt/logs/*swarm_log* /home/ubuntu/SwarmLearningKLTN/mnist_2hosts"
-ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning/ && sudo ./scripts/bin/swarmLogCollector "hub.myenterpriselicense.hpe.com/hpe/swarm-learning" "workspace=/opt/hpe/swarm-learning/workspace/mnist" && sudo mv /opt/logs/*swarm_log* /home/ubuntu/SwarmLearningKLTN/mnist_2hosts"
+ssh ${REMOTE_USER}@${REMOTE_IP1} "cd /opt/hpe/swarm-learning/ && sudo ./scripts/bin/swarmLogCollector "hub.myenterpriselicense.hpe.com/hpe/swarm-learning" "workspace=/opt/hpe/swarm-learning/workspace/mnist" && sudo mv /opt/logs/*swarm_log* ."
+ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning/ && sudo ./scripts/bin/swarmLogCollector "hub.myenterpriselicense.hpe.com/hpe/swarm-learning" "workspace=/opt/hpe/swarm-learning/workspace/mnist" && sudo mv /opt/logs/*swarm_log* ."
 # ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning/ && sudo ./scripts/bin/swarmLogCollector "hub.myenterpriselicense.hpe.com/hpe/swarm-learning" "workspace=/opt/hpe/swarm-learning/workspace/mnist" && sudo mv /opt/logs/*swarm_log* ."
 # ssh ${REMOTE_USER}@${REMOTE_IP4} "cd /opt/hpe/swarm-learning/ && sudo ./scripts/bin/swarmLogCollector "hub.myenterpriselicense.hpe.com/hpe/swarm-learning" "workspace=/opt/hpe/swarm-learning/workspace/mnist" && sudo mv /opt/logs/*swarm_log* ."
 # ssh ${REMOTE_USER}@${REMOTE_IP5} "cd /opt/hpe/swarm-learning/ && sudo ./scripts/bin/swarmLogCollector "hub.myenterpriselicense.hpe.com/hpe/swarm-learning" "workspace=/opt/hpe/swarm-learning/workspace/mnist" && sudo mv /opt/logs/*swarm_log* ."
