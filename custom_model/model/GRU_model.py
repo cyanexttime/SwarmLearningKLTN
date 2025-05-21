@@ -307,6 +307,14 @@ def main():
     X_val, y_val = val_test_samples(val_file)
     X_train, X_test, X_val = normalize_data(X_train, X_test, X_val)
 
+    # ✅ Sanity checks
+    if X_train is None or y_train is None or len(X_train) == 0:
+        raise ValueError(f"Training data not loaded properly from {train_file}")
+    if X_val is None or y_val is None or len(X_val) == 0:
+        raise ValueError(f"Validation data not loaded properly from {val_file}")
+    if X_test is None or y_test is None or len(X_test) == 0:
+        raise ValueError(f"Test data not loaded properly from {test_file}")
+
     print('***** Starting model =', modelName)
     model_gru = GRU_model(X_train.shape[1])
     final_model = compile_train(model_gru,format_3d(X_train),y_train, X_val, y_val,maxEpoch, minPeers, model_name='GRU')
