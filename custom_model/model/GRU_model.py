@@ -95,8 +95,7 @@ def format_3d(df):
 
 def format_2d(df):
     
-    X = np.array(df)
-    return np.reshape(X, (X.shape[0], X.shape[1]))
+    return np.array(df)
 
 def compile_train(model, X_train, y_train, X_val, y_val, maxEpoch, minPeers, deep=True, model_name=None):
     # Get model name if not provided
@@ -322,7 +321,7 @@ def main():
 
     print('***** Starting model =', modelName)
     model_gru = GRU_model(X_train.shape[1])
-    final_model = compile_train(model_gru,format_3d(X_train),y_train, format_3d(X_val), format_2d(y_val),maxEpoch, minPeers, model_name='GRU')
+    final_model = compile_train(model_gru,format_3d(X_train),format_2d(y_train), format_3d(X_val), format_2d(y_val),maxEpoch, minPeers, model_name='GRU')
 
     # Evaluate the model
     results = evaluate_model(final_model, X_test, y_test)
