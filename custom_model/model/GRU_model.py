@@ -31,7 +31,7 @@ trainFileName = 'export_dataframe_proc.csv'
 testFileName = 'export_tests_proc.csv'
 valFileName = 'export_vals_proc.csv'
 
-batch_size = 32
+batch_size = 256
 
 def GRU_model(input_size):
    
