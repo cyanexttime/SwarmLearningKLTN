@@ -139,7 +139,7 @@ def compile_train(model, X_train, y_train, X_val, y_val, maxEpoch, minPeers, dee
         y_train_2d = format_2d(y_train)
         
         # Train the model with SwarmCallback
-        history = model.fit(
+        model.fit(
             X_train_3d, 
             y_train_2d, 
             epochs=maxEpoch, 
@@ -149,7 +149,7 @@ def compile_train(model, X_train, y_train, X_val, y_val, maxEpoch, minPeers, dee
         )
         
         # Return both model and training history
-        return model, history
+        return model
     else:
         # For non-deep learning models
         model.fit(X_train, y_train)
