@@ -120,11 +120,11 @@ def compile_train(model, X_train, y_train, X_val, y_val, maxEpoch, minPeers, dee
         
         # Swarm learning callback with proper validation data
         swarm_callback = SwarmCallback(
-            syncFrequency=10,              # Sync after every 10 batches
+            syncFrequency=200,              # Sync after every 10 batches
             minPeers=minPeers,             # Minimum number of peers to sync
             useAdaptiveSync=True,          # Enable adaptive sync
             adsValData=Valdata,           # Properly formatted validation data
-            node_weightage=1.0,            # Weight for model averaging
+            # node_weightage=1.0,            # Weight for model averaging
             adsValBatchSize=batch_size,    # Use the global batch_size variable
             mergeMethod='mean',            # Method for model merging
             # Add logging to see what's happening during training
