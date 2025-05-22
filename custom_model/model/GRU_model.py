@@ -24,7 +24,7 @@ from sklearn.preprocessing import StandardScaler,MinMaxScaler
 # -> CIC-DDoS2019 82
 # -> CIC-IDS2018 78
 
-defaultMaxEpoch = 10
+defaultMaxEpoch = 2
 defaultMinPeers = 2
 
 trainFileName = 'export_dataframe_proc.csv'
