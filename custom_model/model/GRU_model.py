@@ -120,7 +120,7 @@ def compile_train(model, X_train, y_train, X_val, y_val, maxEpoch, minPeers, dee
         
         # Swarm learning callback with proper validation data
         swarm_callback = SwarmCallback(
-            syncFrequency=200,              # Sync after every 10 batches
+            syncFrequency=1024,              # Sync after every 10 batches
             minPeers=minPeers,             # Minimum number of peers to sync
             useAdaptiveSync=True,          # Enable adaptive sync
             adsValData=Valdata,           # Properly formatted validation data
