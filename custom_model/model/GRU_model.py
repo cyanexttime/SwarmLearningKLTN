@@ -334,7 +334,7 @@ def main():
 
     model_path = os.path.join(scratchDir, modelName)
     final_model.save(model_path)
-    print('Saved the trained model!')
+    print(f"Saved the trained model to: {model_path}")
 
 if __name__ == "__main__":
     main()
