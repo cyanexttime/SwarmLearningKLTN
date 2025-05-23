@@ -31,7 +31,7 @@ trainFileName = 'export_dataframe_proc.csv'
 testFileName = 'export_tests_proc.csv'
 valFileName = 'export_vals_proc.csv'
 
-batch_size = 256
+batch_size = 512
 
 def GRU_model(input_size):
    
@@ -125,7 +125,7 @@ def compile_train(model, X_train, y_train, X_val, y_val, maxEpoch, minPeers, dee
             useAdaptiveSync=True,          # Enable adaptive sync
             adsValData=Valdata,           # Properly formatted validation data
             # node_weightage=1.0,            # Weight for model averaging
-            adsValBatchSize=batch_size,    # Use the global batch_size variable
+            adsValBatchSize=128,    # Use the global batch_size variable
             mergeMethod='mean',            # Method for model merging
             # Add logging to see what's happening during training
             logDir=os.path.join(os.getenv('SCRATCH_DIR', '/platform/scratch'), 'swarm_logs')
