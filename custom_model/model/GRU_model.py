@@ -3,6 +3,9 @@ import pandas as pd
 import numpy as np
 from sklearn.utils import resample
 from sklearn import preprocessing
+import matplotlib
+matplotlib.use('Agg') # Use a non-interactive backend, good for scripts/Docker
+import matplotlib.pyplot as plt
 # Import required libraries
 from keras.models import Sequential
 
@@ -24,7 +27,7 @@ from sklearn.preprocessing import StandardScaler,MinMaxScaler
 # -> CIC-DDoS2019 82
 # -> CIC-IDS2018 78
 
-defaultMaxEpoch = 2
+defaultMaxEpoch = 10
 defaultMinPeers = 2
 
 trainFileName = 'export_dataframe_proc.csv'
@@ -139,7 +142,7 @@ def compile_train(model, X_train, y_train, X_val, y_val, maxEpoch, minPeers, dee
         y_train_2d = format_2d(y_train)
         
         # Train the model with SwarmCallback
-        model.fit(
+        history = model.fit(
             X_train_3d, 
             y_train_2d, 
             epochs=maxEpoch, 
@@ -147,7 +150,36 @@ def compile_train(model, X_train, y_train, X_val, y_val, maxEpoch, minPeers, dee
             verbose=1,
             callbacks=[swarm_callback]
         )
+
+        # Create a directory for saving plots if it doesn't exist
+        plots_dir = 'training_plots'
+        os.makedirs(plots_dir, exist_ok=True)
         
+        # summarize history for accuracy
+        plt.figure(figsize=(10, 4))
+        plt.subplot(1, 2, 1)
+        plt.plot(history.history['accuracy'])  # Updated from 'acc' to 'accuracy'
+        plt.title('Model Accuracy')
+        plt.ylabel('Accuracy')
+        plt.xlabel('Epoch')
+        plt.legend(['train'], loc='upper left')
+        
+        # summarize history for loss
+        plt.subplot(1, 2, 2)
+        plt.plot(history.history['loss'])
+        plt.title('Model Loss')
+        plt.ylabel('Loss')
+        plt.xlabel('Epoch')
+        plt.legend(['train'], loc='upper left')
+        plt.tight_layout()
+        plt.show()
+
+        print(model.metrics_names)
+
+        plot_path = os.path.join(plots_dir, f"{model_name}_training_progress.png")
+        plt.savefig(plot_path)
+        plt.close() # Close the figure to free memory
+        print(f"Training progress plot saved to {plot_path}")
         # Return both model and training history
         return model
     else:
