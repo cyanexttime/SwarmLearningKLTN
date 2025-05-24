@@ -123,13 +123,13 @@ def compile_train(model, X_train, y_train, X_val, y_val, maxEpoch, minPeers, dee
         
         # Swarm learning callback with proper validation data
         swarm_callback = SwarmCallback(
-            syncFrequency=64,              # Sync after every 10 batches
+            syncFrequency=512,              # Sync after every 10 batches
             minPeers=minPeers,             # Minimum number of peers to sync
             useAdaptiveSync=True,          # Enable adaptive sync
             adsValData=Valdata,           # Properly formatted validation data
             # node_weightage=1.0,            # Weight for model averaging
             adsValBatchSize=128,    # Use the global batch_size variable
-            mergeMethod='weighted_mean',            # Method for model merging
+            mergeMethod='coordmedian',            # Method for model merging
             node_weightage=0.18,            # Weight for model averaging
             # Add logging to see what's happening during training
             logDir=os.path.join(os.getenv('SCRATCH_DIR', '/platform/scratch'), 'swarm_logs')
