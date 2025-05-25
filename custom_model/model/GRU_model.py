@@ -130,7 +130,7 @@ def compile_train(model, X_train, y_train, X_val, y_val, maxEpoch, minPeers, dee
             # node_weightage=1.0,            # Weight for model averaging
             adsValBatchSize=128,    # Use the global batch_size variable
             mergeMethod='coordmedian',            # Method for model merging
-            nodeWeightage=18,            # Weight for model averaging
+            # nodeWeightage=18,            # Weight for model averaging
             # Add logging to see what's happening during training
             logDir=os.path.join(os.getenv('SCRATCH_DIR', '/platform/scratch'), 'swarm_logs')
         )
