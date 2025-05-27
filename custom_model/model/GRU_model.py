@@ -34,7 +34,7 @@ trainFileName = 'export_dataframe_proc.csv'
 testFileName = 'export_tests_proc.csv'
 valFileName = 'export_vals_proc.csv'
 
-batch_size = 512
+batch_size = 128
 
 def GRU_model(input_size):
    
@@ -123,9 +123,9 @@ def compile_train(model, X_train, y_train, X_val, y_val, maxEpoch, minPeers, dee
         
         # Swarm learning callback with proper validation data
         swarm_callback = SwarmCallback(
-            syncFrequency=512,              # Sync after every 10 batches
+            syncFrequency=128,              # Sync after every 10 batches
             minPeers=minPeers,             # Minimum number of peers to sync
-            useAdaptiveSync=True,          # Enable adaptive sync
+            useAdaptiveSync=False,          # Disable adaptive sync
             adsValData=Valdata,           # Properly formatted validation data
             adsValBatchSize=128,    # Use the global batch_size variable
             mergeMethod='coordmedian',            # Method for model merging
@@ -151,36 +151,7 @@ def compile_train(model, X_train, y_train, X_val, y_val, maxEpoch, minPeers, dee
             callbacks=[swarm_callback]
         )
         
-        # # Create a directory for saving plots if it doesn't exist
-        # plots_dir = 'training_plots'
-        # os.makedirs(plots_dir, exist_ok=True)
         
-        # # summarize history for accuracy
-        # plt.figure(figsize=(10, 4))
-        # plt.subplot(1, 2, 1)
-        # plt.plot(history.history['accuracy'])  # Updated from 'acc' to 'accuracy'
-        # plt.title('Model Accuracy')
-        # plt.ylabel('Accuracy')
-        # plt.xlabel('Epoch')
-        # plt.legend(['train'], loc='upper left')
-        
-        # # summarize history for loss
-        # plt.subplot(1, 2, 2)
-        # plt.plot(history.history['loss'])
-        # plt.title('Model Loss')
-        # plt.ylabel('Loss')
-        # plt.xlabel('Epoch')
-        # plt.legend(['train'], loc='upper left')
-        # plt.tight_layout()
-        # plt.show()
-
-        # print(model.metrics_names)
-
-        # plot_path = os.path.join(plots_dir, f"{model_name}_training_progress.png")
-        # plt.savefig(plot_path)
-        # plt.close() # Close the figure to free memory
-        # print(f"Training progress plot saved to {plot_path}")
-        # Return both model and training history
         return model
     else:
         # For non-deep learning models
