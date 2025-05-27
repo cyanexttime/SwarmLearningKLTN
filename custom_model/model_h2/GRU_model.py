@@ -6,6 +6,9 @@ from sklearn import preprocessing
 import matplotlib
 matplotlib.use('Agg') # Use a non-interactive backend, good for scripts/Docker
 import matplotlib.pyplot as plt
+from keras.callbacks import EarlyStopping
+import tensorflow as tf
+
 # Import required libraries
 from keras.models import Sequential
 
@@ -107,7 +110,7 @@ def compile_train(model, X_train, y_train, X_val, y_val, maxEpoch, minPeers, dee
     
     if deep:
         model.compile(loss='binary_crossentropy',
-                    optimizer='adam',
+                    optimizer=tf.keras.optimizers.Adam(learning_rate=0.006),
                     metrics=['accuracy'])
         
         # Prepare validation data specifically for adaptive data sharing
@@ -120,6 +123,12 @@ def compile_train(model, X_train, y_train, X_val, y_val, maxEpoch, minPeers, dee
         
         # Monitor validation metrics during training
         print(f"Validation data shape for SwarmCallback: X={X_val_3d.shape}, y={y_val_2d.shape}")
+
+        # early_stopping = EarlyStopping(
+        #     monitor='val_loss',
+        #     patience=3,
+        #     restore_best_weights=True
+        # )
         
         # Swarm learning callback with proper validation data
         swarm_callback = SwarmCallback(
@@ -148,6 +157,7 @@ def compile_train(model, X_train, y_train, X_val, y_val, maxEpoch, minPeers, dee
             epochs=maxEpoch, 
             batch_size=batch_size, 
             verbose=1,
+            validation_data=Valdata,
             callbacks=[swarm_callback]
         )
 

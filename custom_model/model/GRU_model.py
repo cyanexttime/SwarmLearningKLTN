@@ -2,6 +2,7 @@ import logging
 import pandas as pd
 import numpy as np
 from sklearn.utils import resample
+import tensorflow as tf
 from sklearn import preprocessing
 import matplotlib
 matplotlib.use('Agg') # Use a non-interactive backend, good for scripts/Docker
@@ -23,6 +24,7 @@ import os
 from sklearn.metrics import confusion_matrix, precision_score, recall_score, f1_score, cohen_kappa_score, accuracy_score
 # Import `StandardScaler` from `sklearn.preprocessing`
 from sklearn.preprocessing import StandardScaler,MinMaxScaler
+from keras.callbacks import EarlyStopping
 #input_size
 # -> CIC-DDoS2019 82
 # -> CIC-IDS2018 78
@@ -107,7 +109,7 @@ def compile_train(model, X_train, y_train, X_val, y_val, maxEpoch, minPeers, dee
     
     if deep:
         model.compile(loss='binary_crossentropy',
-                    optimizer='adam',
+                    optimizer=tf.keras.optimizers.Adam(learning_rate=0.006),
                     metrics=['accuracy'])
         
         # Prepare validation data specifically for adaptive data sharing
@@ -120,13 +122,19 @@ def compile_train(model, X_train, y_train, X_val, y_val, maxEpoch, minPeers, dee
         
         # Monitor validation metrics during training
         print(f"Validation data shape for SwarmCallback: X={X_val_3d.shape}, y={y_val_2d.shape}")
+
+        # early_stopping = EarlyStopping(
+        #     monitor='val_loss',
+        #     patience=3,
+        #     restore_best_weights=True
+        # )
         
         # Swarm learning callback with proper validation data
         swarm_callback = SwarmCallback(
             syncFrequency=128,              # Sync after every 10 batches
             minPeers=minPeers,             # Minimum number of peers to sync
             useAdaptiveSync=False,          # Disable adaptive sync
-            adsValData=Valdata,           # Properly formatted validation data
+            # adsValData=Valdata,           # Properly formatted validation data
             adsValBatchSize=128,    # Use the global batch_size variable
             mergeMethod='coordmedian',            # Method for model merging
             # nodeWeightage=18,            # Weight for model averaging
@@ -148,6 +156,7 @@ def compile_train(model, X_train, y_train, X_val, y_val, maxEpoch, minPeers, dee
             epochs=maxEpoch, 
             batch_size=batch_size, 
             verbose=1,
+            validation_data=Valdata,  # Use the validation data tuple
             callbacks=[swarm_callback]
         )
         
