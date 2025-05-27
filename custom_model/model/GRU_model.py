@@ -123,11 +123,11 @@ def compile_train(model, X_train, y_train, X_val, y_val, maxEpoch, minPeers, dee
         # Monitor validation metrics during training
         print(f"Validation data shape for SwarmCallback: X={X_val_3d.shape}, y={y_val_2d.shape}")
 
-        # early_stopping = EarlyStopping(
-        #     monitor='val_loss',
-        #     patience=3,
-        #     restore_best_weights=True
-        # )
+        early_stopping = EarlyStopping(
+            monitor='val_loss',
+            patience=3,
+            restore_best_weights=True
+        )
         
         # Swarm learning callback with proper validation data
         swarm_callback = SwarmCallback(
@@ -157,7 +157,7 @@ def compile_train(model, X_train, y_train, X_val, y_val, maxEpoch, minPeers, dee
             batch_size=batch_size, 
             verbose=1,
             validation_data=Valdata,  # Use the validation data tuple
-            callbacks=[swarm_callback]
+            callbacks=[swarm_callback, early_stopping]
         )
         
         # # summarize history for accuracy
