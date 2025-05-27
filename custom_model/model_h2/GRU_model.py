@@ -100,7 +100,7 @@ def format_2d(df):
     
     return np.array(df).flatten()
 
-def compile_train(model, X_train, y_train, X_val, y_val, maxEpoch, minPeers, deep=True, model_name=None):
+def compile_train(model, X_train, y_train, X_val, y_val, maxEpoch, minPeers, deep=True, model_name=None, graph_path=None):
     # Get model name if not provided
     if model_name is None:
         model_name = model.__class__.__name__
@@ -142,7 +142,7 @@ def compile_train(model, X_train, y_train, X_val, y_val, maxEpoch, minPeers, dee
         y_train_2d = format_2d(y_train)
         
         # Train the model with SwarmCallback
-        model.fit(
+        history = model.fit(
             X_train_3d, 
             y_train_2d, 
             epochs=maxEpoch, 
@@ -151,36 +151,29 @@ def compile_train(model, X_train, y_train, X_val, y_val, maxEpoch, minPeers, dee
             callbacks=[swarm_callback]
         )
 
-        # # Create a directory for saving plots if it doesn't exist
-        # plots_dir = 'training_plots'
-        # os.makedirs(plots_dir, exist_ok=True)
+        # summarize history for accuracy
+        plt.figure(figsize=(10, 4))
+        plt.subplot(1, 2, 1)
+        plt.plot(history.history['accuracy'])  # Updated from 'acc' to 'accuracy'
+        plt.title('Model Accuracy')
+        plt.ylabel('Accuracy')
+        plt.xlabel('Epoch')
+        plt.legend(['train'], loc='upper left')
         
-        # # summarize history for accuracy
-        # plt.figure(figsize=(10, 4))
-        # plt.subplot(1, 2, 1)
-        # plt.plot(history.history['accuracy'])  # Updated from 'acc' to 'accuracy'
-        # plt.title('Model Accuracy')
-        # plt.ylabel('Accuracy')
-        # plt.xlabel('Epoch')
-        # plt.legend(['train'], loc='upper left')
-        
-        # # summarize history for loss
-        # plt.subplot(1, 2, 2)
-        # plt.plot(history.history['loss'])
-        # plt.title('Model Loss')
-        # plt.ylabel('Loss')
-        # plt.xlabel('Epoch')
-        # plt.legend(['train'], loc='upper left')
-        # plt.tight_layout()
-        # plt.show()
+        # summarize history for loss
+        plt.subplot(1, 2, 2)
+        plt.plot(history.history['loss'])
+        plt.title('Model Loss')
+        plt.ylabel('Loss')
+        plt.xlabel('Epoch')
+        plt.legend(['train'], loc='upper left')
+        plt.tight_layout()
+        plt.show()
 
-        # print(model.metrics_names)
+        plt.savefig(graph_path)
 
-        # plot_path = os.path.join(plots_dir, f"{model_name}_training_progress.png")
-        # plt.savefig(plot_path)
-        # plt.close() # Close the figure to free memory
-        # print(f"Training progress plot saved to {plot_path}")
-        # Return both model and training history
+        print(model.metrics_names)
+
         return model
     else:
         # For non-deep learning models
@@ -355,9 +348,11 @@ def main():
     print("X_test:\n", X_test[:3])
     print("y_test:\n", y_test[:3])
 
+    graph_path = os.path.join(scratchDir, modelName + '_training_graph.png')
+
     print('***** Starting model =', modelName)
     model_gru = GRU_model(X_train.shape[1])
-    final_model = compile_train(model_gru,X_train,y_train, X_val, y_val, maxEpoch, minPeers, model_name='GRU')
+    final_model = compile_train(model_gru,X_train,y_train, X_val, y_val, maxEpoch, minPeers, model_name='GRU', graph_path=graph_path)
 
     # Evaluate the model
     results = evaluate_model(final_model, X_test, y_test)
