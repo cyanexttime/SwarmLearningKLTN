@@ -110,7 +110,7 @@ def compile_train(model, X_train, y_train, X_val, y_val, maxEpoch, minPeers, dee
     
     if deep:
         model.compile(loss='binary_crossentropy',
-                    optimizer=tf.keras.optimizers.Adam(learning_rate=0.006),
+                    optimizer='adam',
                     metrics=['accuracy'])
         
         # Prepare validation data specifically for adaptive data sharing
