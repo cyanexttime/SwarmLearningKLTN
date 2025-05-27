@@ -134,7 +134,7 @@ def compile_train(model, X_train, y_train, X_val, y_val, maxEpoch, minPeers, dee
             syncFrequency=128,              # Sync after every 10 batches
             minPeers=minPeers,             # Minimum number of peers to sync
             useAdaptiveSync=False,          # Disable adaptive sync
-            # adsValData=Valdata,           # Properly formatted validation data
+            adsValData=Valdata,           # Properly formatted validation data
             adsValBatchSize=128,    # Use the global batch_size variable
             mergeMethod='coordmedian',            # Method for model merging
             # nodeWeightage=18,            # Weight for model averaging
