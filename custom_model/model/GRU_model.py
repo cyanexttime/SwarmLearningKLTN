@@ -150,7 +150,7 @@ def compile_train(model, X_train, y_train, X_val, y_val, maxEpoch, minPeers, dee
             verbose=1,
             callbacks=[swarm_callback]
         )
-
+        
         # # Create a directory for saving plots if it doesn't exist
         # plots_dir = 'training_plots'
         # os.makedirs(plots_dir, exist_ok=True)
@@ -365,7 +365,7 @@ def main():
     print(results)
 
     model_path = os.path.join(scratchDir, modelName)
-    final_model.save(model_path)
+    final_model.save(model_path, save_format='.h5')
     print(f"Saved the trained model to: {model_path}")
 
 if __name__ == "__main__":
