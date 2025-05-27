@@ -151,28 +151,30 @@ def compile_train(model, X_train, y_train, X_val, y_val, maxEpoch, minPeers, dee
             callbacks=[swarm_callback]
         )
         
-        # summarize history for accuracy
-        plt.figure(figsize=(10, 4))
-        plt.subplot(1, 2, 1)
-        plt.plot(history.history['accuracy'])  # Updated from 'acc' to 'accuracy'
-        plt.title('Model Accuracy')
-        plt.ylabel('Accuracy')
-        plt.xlabel('Epoch')
-        plt.legend(['train'], loc='upper left')
+        # # summarize history for accuracy
+        # plt.figure(figsize=(10, 4))
+        # plt.subplot(1, 2, 1)
+        # plt.plot(history.history['accuracy'])  # Updated from 'acc' to 'accuracy'
+        # plt.title('Model Accuracy')
+        # plt.ylabel('Accuracy')
+        # plt.xlabel('Epoch')
+        # plt.legend(['train'], loc='upper left')
         
-        # summarize history for loss
-        plt.subplot(1, 2, 2)
-        plt.plot(history.history['loss'])
-        plt.title('Model Loss')
-        plt.ylabel('Loss')
-        plt.xlabel('Epoch')
-        plt.legend(['train'], loc='upper left')
-        plt.tight_layout()
-        plt.show()
+        # # summarize history for loss
+        # plt.subplot(1, 2, 2)
+        # plt.plot(history.history['loss'])
+        # plt.title('Model Loss')
+        # plt.ylabel('Loss')
+        # plt.xlabel('Epoch')
+        # plt.legend(['train'], loc='upper left')
+        # plt.tight_layout()
+        # plt.show()
 
-        plt.savefig(graph_path)
+        # plt.savefig(graph_path)
 
-        print(model.metrics_names)
+        # print(model.metrics_names)
+
+        print("History keys:", history.history.keys())
 
         
         return model
