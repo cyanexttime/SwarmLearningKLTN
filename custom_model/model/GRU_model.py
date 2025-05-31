@@ -34,7 +34,7 @@ defaultMinPeers = 2
 
 trainFileName = 'training_h1.csv'
 testFileName = 'test.csv'
-valFileName = 'val.csv'
+valFileName = 'vals.csv'
 
 batch_size = 32
 
