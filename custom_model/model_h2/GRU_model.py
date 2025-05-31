@@ -36,7 +36,7 @@ trainFileName = 'training_h2.csv'
 testFileName = 'test.csv'
 valFileName = 'vals.csv'
 
-batch_size = 32
+batch_size = 512
 
 def GRU_model(input_size):
    
@@ -131,11 +131,11 @@ def compile_train(model, X_train, y_train, X_val, y_val, maxEpoch, minPeers, dee
         
         # Swarm learning callback with proper validation data
         swarm_callback = SwarmCallback(
-            syncFrequency=128,              # Sync after every 10 batches
+            syncFrequency=1024,              # Sync after every 10 batches
             minPeers=minPeers,             # Minimum number of peers to sync
             useAdaptiveSync=False,          # Disable adaptive sync
             adsValData=Valdata,           # Properly formatted validation data
-            adsValBatchSize=32,    # Use the global batch_size variable
+            adsValBatchSize=512,    # Use the global batch_size variable
             mergeMethod='coordmedian',            # Method for model merging
             # nodeWeightage=18,            # Weight for model averaging
             # Add logging to see what's happening during training
