@@ -32,9 +32,9 @@ from keras.callbacks import EarlyStopping
 defaultMaxEpoch = 10
 defaultMinPeers = 2
 
-trainFileName = 'export_dataframe_proc.csv'
-testFileName = 'export_tests_proc.csv'
-valFileName = 'export_vals_proc.csv'
+trainFileName = 'training_h1.csv'
+testFileName = 'test.csv'
+valFileName = 'val.csv'
 
 batch_size = 32
 
@@ -55,20 +55,20 @@ def GRU_model(input_size):
 
 
 
-def train_test(samples):
+# def train_test(samples):
     
     
-    # Specify the data 
-    X=samples.iloc[:,0:(samples.shape[1]-1)]
+#     # Specify the data 
+#     X=samples.iloc[:,0:(samples.shape[1]-1)]
     
-    # Specify the target labels and flatten the array
-    #y= np.ravel(amostras.type)
-    y= samples.iloc[:,-1]
+#     # Specify the target labels and flatten the array
+#     #y= np.ravel(amostras.type)
+#     y= samples.iloc[:,-1]
     
-    # Split the data up in train and test sets
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
+#     # Split the data up in train and test sets
+#     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
     
-    return X_train, X_test, y_train, y_test
+#     return X_train, X_test, y_train, y_test
 
 
 # normalize input data
@@ -136,7 +136,7 @@ def compile_train(model, X_train, y_train, X_val, y_val, maxEpoch, minPeers, dee
             useAdaptiveSync=False,          # Disable adaptive sync
             adsValData=Valdata,           # Properly formatted validation data
             adsValBatchSize=32,    # Use the global batch_size variable
-            mergeMethod='mean',            # Method for model merging
+            mergeMethod='coordmedian',            # Method for model merging
             # nodeWeightage=18,            # Weight for model averaging
             # Add logging to see what's happening during training
             logDir=os.path.join(os.getenv('SCRATCH_DIR', '/platform/scratch'), 'swarm_logs')
@@ -156,7 +156,6 @@ def compile_train(model, X_train, y_train, X_val, y_val, maxEpoch, minPeers, dee
             epochs=maxEpoch, 
             batch_size=batch_size, 
             verbose=1,
-            validation_data=Valdata,  # Use the validation data tuple
             callbacks=[swarm_callback, early_stopping]
         )
         
@@ -258,17 +257,20 @@ def train_samples(input_file):
         
     samples = pd.read_csv(input_file, sep=',')
 
-    X_train, X_test, y_train, y_test = train_test(samples)
+    # You'll need to define X_train and y_train based on your 'samples' DataFrame
+    # For example, if 'Label' is the last column:
+    X = samples.drop(' Label', axis=1) # Features
+    y = samples[' Label'] # Target variable
 
 
     #junta novamente pra aumentar o numero de normais
-    X = pd.concat([X_train, y_train], axis=1)
+    combined_data = pd.concat([X, y], axis=1)
 
     # separate minority and majority classes
-    is_benign = X[' Label']==0 #base de dados toda junta
+    is_benign = combined_data[' Label']==0 #base de dados toda junta
 
-    normal = X[is_benign]
-    ddos = X[~is_benign]
+    normal = combined_data[is_benign]
+    ddos = combined_data[~is_benign]
 
     # upsample minority
     normal_upsampled = resample(normal,

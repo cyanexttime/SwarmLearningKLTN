@@ -2,13 +2,11 @@ import logging
 import pandas as pd
 import numpy as np
 from sklearn.utils import resample
+import tensorflow as tf
 from sklearn import preprocessing
 import matplotlib
 matplotlib.use('Agg') # Use a non-interactive backend, good for scripts/Docker
 import matplotlib.pyplot as plt
-from keras.callbacks import EarlyStopping
-import tensorflow as tf
-
 # Import required libraries
 from keras.models import Sequential
 
@@ -26,6 +24,7 @@ import os
 from sklearn.metrics import confusion_matrix, precision_score, recall_score, f1_score, cohen_kappa_score, accuracy_score
 # Import `StandardScaler` from `sklearn.preprocessing`
 from sklearn.preprocessing import StandardScaler,MinMaxScaler
+from keras.callbacks import EarlyStopping
 #input_size
 # -> CIC-DDoS2019 82
 # -> CIC-IDS2018 78
@@ -33,11 +32,11 @@ from sklearn.preprocessing import StandardScaler,MinMaxScaler
 defaultMaxEpoch = 10
 defaultMinPeers = 2
 
-trainFileName = 'export_dataframe_proc.csv'
-testFileName = 'export_tests_proc.csv'
-valFileName = 'export_vals_proc.csv'
+trainFileName = 'training_h2.csv'
+testFileName = 'test.csv'
+valFileName = 'val.csv'
 
-batch_size = 128
+batch_size = 32
 
 def GRU_model(input_size):
    
@@ -56,20 +55,20 @@ def GRU_model(input_size):
 
 
 
-def train_test(samples):
+# def train_test(samples):
     
     
-    # Specify the data 
-    X=samples.iloc[:,0:(samples.shape[1]-1)]
+#     # Specify the data 
+#     X=samples.iloc[:,0:(samples.shape[1]-1)]
     
-    # Specify the target labels and flatten the array
-    #y= np.ravel(amostras.type)
-    y= samples.iloc[:,-1]
+#     # Specify the target labels and flatten the array
+#     #y= np.ravel(amostras.type)
+#     y= samples.iloc[:,-1]
     
-    # Split the data up in train and test sets
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
+#     # Split the data up in train and test sets
+#     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
     
-    return X_train, X_test, y_train, y_test
+#     return X_train, X_test, y_train, y_test
 
 
 # normalize input data
@@ -135,9 +134,9 @@ def compile_train(model, X_train, y_train, X_val, y_val, maxEpoch, minPeers, dee
             syncFrequency=128,              # Sync after every 10 batches
             minPeers=minPeers,             # Minimum number of peers to sync
             useAdaptiveSync=False,          # Disable adaptive sync
-            adsValData=Valdata,           # Properly formatted validation data            
-            adsValBatchSize=128,    # Use the global batch_size variable
-            mergeMethod='mean',            # Method for model merging
+            adsValData=Valdata,           # Properly formatted validation data
+            adsValBatchSize=32,    # Use the global batch_size variable
+            mergeMethod='coordmedian',            # Method for model merging
             # nodeWeightage=18,            # Weight for model averaging
             # Add logging to see what's happening during training
             logDir=os.path.join(os.getenv('SCRATCH_DIR', '/platform/scratch'), 'swarm_logs')
@@ -157,10 +156,9 @@ def compile_train(model, X_train, y_train, X_val, y_val, maxEpoch, minPeers, dee
             epochs=maxEpoch, 
             batch_size=batch_size, 
             verbose=1,
-            validation_data=Valdata,
             callbacks=[swarm_callback, early_stopping]
         )
-
+        
         # # summarize history for accuracy
         # plt.figure(figsize=(10, 4))
         # plt.subplot(1, 2, 1)
@@ -186,7 +184,7 @@ def compile_train(model, X_train, y_train, X_val, y_val, maxEpoch, minPeers, dee
 
         print("History keys:", history.history.keys())
 
-
+        
         return model
     else:
         # For non-deep learning models
@@ -259,17 +257,20 @@ def train_samples(input_file):
         
     samples = pd.read_csv(input_file, sep=',')
 
-    X_train, X_test, y_train, y_test = train_test(samples)
+    # You'll need to define X_train and y_train based on your 'samples' DataFrame
+    # For example, if 'Label' is the last column:
+    X = samples.drop(' Label', axis=1) # Features
+    y = samples[' Label'] # Target variable
 
 
     #junta novamente pra aumentar o numero de normais
-    X = pd.concat([X_train, y_train], axis=1)
+    combined_data = pd.concat([X, y], axis=1)
 
     # separate minority and majority classes
-    is_benign = X[' Label']==0 #base de dados toda junta
+    is_benign = combined_data[' Label']==0 #base de dados toda junta
 
-    normal = X[is_benign]
-    ddos = X[~is_benign]
+    normal = combined_data[is_benign]
+    ddos = combined_data[~is_benign]
 
     # upsample minority
     normal_upsampled = resample(normal,
@@ -348,6 +349,8 @@ def main():
     X_val, y_val = val_test_samples(val_file)
     X_train, X_test, X_val = normalize_data(X_train, X_test, X_val)
 
+    graph_path = os.path.join(scratchDir, modelName + '_training_graph.png')
+
      # ✅ Print preview of datasets
     print(f"\n--- Sample of Training Data ({train_file}) ---")
     print("X_train:\n", X_train[:3])
@@ -361,8 +364,6 @@ def main():
     print("X_test:\n", X_test[:3])
     print("y_test:\n", y_test[:3])
 
-    graph_path = os.path.join(scratchDir, modelName + '_training_graph.png')
-
     print('***** Starting model =', modelName)
     model_gru = GRU_model(X_train.shape[1])
     final_model = compile_train(model_gru,X_train,y_train, X_val, y_val, maxEpoch, minPeers, model_name='GRU', graph_path=graph_path)
@@ -371,7 +372,7 @@ def main():
     results = evaluate_model(final_model, X_test, y_test)
     print('***** Results:')
     print(results)
-    
+
     model_path = os.path.join(scratchDir, modelName)
     final_model.save(os.path.join(model_path, modelName + '.h5'))
     print(f"Saved the trained model to: {model_path}")
