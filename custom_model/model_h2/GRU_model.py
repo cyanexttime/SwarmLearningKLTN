@@ -254,40 +254,41 @@ def test_normal_atk(y_test,y_pred):
     
 def train_samples(input_file):    
     # UPSAMPLE OF NORMAL FLOWS
-        
     samples = pd.read_csv(input_file, sep=',')
 
-    # You'll need to define X_train and y_train based on your 'samples' DataFrame
-    # For example, if 'Label' is the last column:
-    X = samples.drop(' Label', axis=1) # Features
-    y = samples[' Label'] # Target variable
+    # Split features and target
+    X = samples.drop(' Label', axis=1)  # Features
+    y = samples[' Label']               # Target variable
 
-
-    #junta novamente pra aumentar o numero de normais
+    # Recombine features and target
     combined_data = pd.concat([X, y], axis=1)
 
-    # separate minority and majority classes
-    is_benign = combined_data[' Label']==0 #base de dados toda junta
-
+    # Separate benign and attack samples
+    is_benign = combined_data[' Label'] == 0
     normal = combined_data[is_benign]
     ddos = combined_data[~is_benign]
 
-    # upsample minority
+    # Upsample benign to match number of attack samples
     normal_upsampled = resample(normal,
-                            replace=True, # sample with replacement
-                            n_samples=len(ddos), # match number in majority class
-                            random_state=27) # reproducible results
+                                replace=True,
+                                n_samples=len(ddos),
+                                random_state=27)
 
-    # combine majority and upsampled minority
+    # Combine upsampled benign and attack samples
     upsampled = pd.concat([normal_upsampled, ddos])
 
-    # Specify the data 
-    X_train=upsampled.iloc[:,0:(upsampled.shape[1]-1)]    #DDoS
-    y_train= upsampled.iloc[:,-1]  #DDoS
+    # Separate features and labels for training
+    X_train = upsampled.iloc[:, :-1]
+    y_train = upsampled.iloc[:, -1]
 
     input_size = (X_train.shape[1], 1)
-    print('input_size:',input_size)
-    print('X_train:',X_train.shape[1])
+    print('input_size:', input_size)
+    print('X_train shape:', X_train.shape)
+
+    # ✅ Print class distribution
+    print("\nValue counts for 'Label' after upsampling:")
+    print(upsampled[' Label'].value_counts())
+
     return X_train, y_train
 
 def val_test_samples(input_file):
@@ -306,11 +307,39 @@ def val_test_samples(input_file):
     return X_test_val, y_test_val
 
 def evaluate_model(model, X_test, y_test):
-    y_pred = model.predict(format_3d(X_test)) 
-    y_pred = y_pred.round()
+    # Combine features and labels into one DataFrame for balancing
+    df = pd.concat([X_test.reset_index(drop=True), pd.Series(y_test, name='Label')], axis=1)
+
+    # Separate benign (0) and attack (1 or others)
+    normal = df[df['Label'] == 0]
+    attack = df[df['Label'] != 0]
+
+    # Upsample benign to match attack count
+    normal_upsampled = resample(normal,
+                                replace=True,
+                                n_samples=len(attack),
+                                random_state=27)
+
+    # Combine back to balanced dataframe
+    balanced_df = pd.concat([normal_upsampled, attack])
+
+    # Shuffle balanced dataset to avoid ordering bias
+    balanced_df = balanced_df.sample(frac=1, random_state=27).reset_index(drop=True)
+
+    # Separate balanced features and labels
+    y_balanced = balanced_df['Label']
+    X_balanced = balanced_df.drop(columns=['Label'])
+
+    # Predict using the model (assumes your format_3d function reshapes X properly)
+    y_pred_prob = model.predict(format_3d(X_balanced))
+    y_pred = y_pred_prob.round()
+
+    # Prepare results dataframe
     results = pd.DataFrame(columns=['Method','Accuracy','Precision','Recall', 'F1_Score', 'Average','Normal_Detect_Rate','Atk_Detect_Rate'])
-    acc, prec, rec, f1, avrg = testes(model, format_3d(X_test), y_test, y_pred)
-    norm, atk = test_normal_atk(y_test, y_pred)
+
+    # Calculate metrics - assumes your testes() and test_normal_atk() functions exist and work with these inputs
+    acc, prec, rec, f1, avrg = testes(model, format_3d(X_balanced), y_balanced, y_pred)
+    norm, atk = test_normal_atk(y_balanced, y_pred)
 
     new_row = pd.DataFrame([{
         'Method': 'GRU',
