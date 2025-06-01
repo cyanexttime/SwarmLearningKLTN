@@ -29,7 +29,7 @@ from keras.callbacks import EarlyStopping
 # -> CIC-DDoS2019 82
 # -> CIC-IDS2018 78
 
-defaultMaxEpoch = 10
+defaultMaxEpoch = 5
 defaultMinPeers = 2
 
 trainFileName = 'training_h1.csv'
