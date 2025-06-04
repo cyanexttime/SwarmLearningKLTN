@@ -5,7 +5,6 @@ from sklearn.utils import resample
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, roc_curve, auc
 import seaborn as sns
 import matplotlib.pyplot as plt
-from swarmlearning.keras import SwarmCallback
 # Import required libraries
 from keras.models import Sequential
 # Import `train_test_split` from `sklearn.model_selection`
@@ -17,6 +16,7 @@ from sklearn.svm import SVC
 from sklearn.linear_model import LogisticRegression, SGDClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import StandardScaler,MinMaxScaler
+from swarmlearning.tf import SwarmCallback
 
 
 #input_size
