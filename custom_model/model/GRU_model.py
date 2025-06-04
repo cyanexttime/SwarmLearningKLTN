@@ -75,6 +75,7 @@ def compile_train(model,X_train,y_train, X_val, y_val, maxEpochs, swarm_callback
         plt.xlabel('epoch')
         plt.legend(['train'], loc='upper left')
         plt.savefig("model_loss.png")
+        plt.close()
 
         print(model.metrics_names)
     
@@ -134,7 +135,7 @@ def testes(model, X_test, y_test, y_pred=None, deep=True, threshold=0.5):
     plt.ylabel("Actual")
     plt.title("Confusion Matrix")
     plt.savefig("confusion_matrix.png")
-
+    plt.close()
     # ROC Curve
     fpr, tpr, _ = roc_curve(y_test, y_score)
     roc_auc = auc(fpr, tpr)
@@ -148,6 +149,7 @@ def testes(model, X_test, y_test, y_pred=None, deep=True, threshold=0.5):
     plt.legend(loc="lower right")
     plt.grid(True)
     plt.savefig("roc_curve.png")
+    plt.close()
 
     return acc, prec, rec, f1, avrg
 
