@@ -1,3 +1,4 @@
+import logging
 import os
 import pandas as pd
 import numpy as np
@@ -267,9 +268,15 @@ def train_and_evaluate(X_train, y_train, X_test, y_test, X_val, y_val, maxEpochs
         syncFrequency=128,
         minPeers=minPeers,
         useAdaptiveSync=False,
-        val_data=(X_val, y_val),
-        node_weightage=1
+        adsValData=(format_3d(X_val), y_val),
+        adsValBatchSize=32,
+        mergeMethod='mean',
+        node_weightage=1,
+        logDir=os.path.join(os.getenv('SCRATCH_DIR', '/platform/scratch'), 'swarm_logs')
     )
+
+    # Set logging level for better visibility
+    swarm_callback.logger.setLevel(logging.DEBUG)
 
     model = GRU_model(X_train.shape[1])
     model = compile_train(model, format_3d(X_train), y_train, format_3d(X_val), y_val, maxEpochs, swarm_callback, deep=True)
