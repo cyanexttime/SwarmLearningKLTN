@@ -296,7 +296,7 @@ defaultMaxEpoch = 10
 defaultMinPeers = 2
 
 trainFileName = 'train_set_2_proc.csv'
-testFileName = 'test_set_proc.csv'
+testFileName = 'export_val_test_proc.csv'
 
 
 def main():
