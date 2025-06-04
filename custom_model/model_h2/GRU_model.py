@@ -1,42 +1,27 @@
-import logging
+import os
 import pandas as pd
 import numpy as np
 from sklearn.utils import resample
-import tensorflow as tf
-from sklearn import preprocessing
-import matplotlib
-matplotlib.use('Agg') # Use a non-interactive backend, good for scripts/Docker
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, roc_curve, auc
+import seaborn as sns
 import matplotlib.pyplot as plt
+from swarmlearning.keras import SwarmCallback
 # Import required libraries
 from keras.models import Sequential
+# Import `train_test_split` from `sklearn.model_selection`
+from sklearn.model_selection import train_test_split
+import numpy as np
 
 from keras.layers import Dense,GRU,Embedding,Dropout,Flatten,Conv1D,MaxPooling1D,LSTM
 from sklearn.svm import SVC
 from sklearn.linear_model import LogisticRegression, SGDClassifier
 from sklearn.neighbors import KNeighborsClassifier
-# Import `train_test_split` from `sklearn.model_selection`
-from sklearn.model_selection import train_test_split
-import numpy as np
-from swarmlearning.tf import SwarmCallback
-import joblib
-import matplotlib.pyplot as plt
-import os
-from sklearn.metrics import confusion_matrix, precision_score, recall_score, f1_score, cohen_kappa_score, accuracy_score
-# Import `StandardScaler` from `sklearn.preprocessing`
 from sklearn.preprocessing import StandardScaler,MinMaxScaler
-from keras.callbacks import EarlyStopping
+
+
 #input_size
 # -> CIC-DDoS2019 82
 # -> CIC-IDS2018 78
-
-defaultMaxEpoch = 5
-defaultMinPeers = 2
-
-trainFileName = 'training_h2.csv'
-testFileName = 'test.csv'
-valFileName = 'vals.csv'
-
-batch_size = 512
 
 def GRU_model(input_size):
    
@@ -53,28 +38,157 @@ def GRU_model(input_size):
     
     return model
 
+# compile and train learning model
+def compile_train(model,X_train,y_train, X_val, y_val, maxEpochs, swarm_callback=None, deep=True):
+    
+    if(deep==True):
+        model.compile(loss='binary_crossentropy',
+                      optimizer='adam',
+                      metrics=['accuracy'])
+        
+        callbacks = []
+        if swarm_callback is not None:
+            callbacks.append(swarm_callback)
+
+        history = model.fit(
+            X_train, y_train,
+            validation_data=(X_val, y_val) if X_val is not None and y_val is not None else None,
+            epochs=maxEpochs,
+            batch_size=256,
+            verbose=1,
+            callbacks=callbacks
+        )
+        #model.fit(X_train, y_train,epochs=3)
+
+        # summarize history for accuracy
+        plt.plot(history.history['accuracy'])
+        plt.title('model accuracy')
+        plt.ylabel('accuracy')
+        plt.xlabel('epoch')
+        plt.legend(['train'], loc='upper left')
+        plt.savefig("model_accuracy.png")
+        # summarize history for loss
+        plt.plot(history.history['loss'])
+        plt.title('model loss')
+        plt.ylabel('loss')
+        plt.xlabel('epoch')
+        plt.legend(['train'], loc='upper left')
+        plt.savefig("model_loss.png")
+
+        print(model.metrics_names)
+    
+    else:
+        model.fit(X_train, y_train) #SVM, LR, GD
+    
+    print('Model Compiled and Trained')
+    return model
+
+def testes(model, X_test, y_test, y_pred=None, deep=True, threshold=0.5):
+    # Evaluate deep learning model if applicable
+    if deep:
+        score = model.evaluate(X_test, y_test, verbose=1)
+        print('Model evaluation score:', score)
+
+    # Predict probabilities and apply threshold if y_pred not provided
+    if y_pred is None:
+        if hasattr(model, "predict_proba"):
+            y_score = model.predict_proba(X_test)[:, 1]
+        else:
+            y_score = model.predict(X_test)
+            if y_score.ndim > 1 and y_score.shape[1] > 1:
+                y_score = y_score[:, 1]  # Assume binary classification
+            else:
+                y_score = y_score.ravel()
+
+        y_pred = (y_score >= threshold).astype(int)
+    else:
+        # If y_pred is provided, derive y_score if needed for ROC
+        if hasattr(model, "predict_proba"):
+            y_score = model.predict_proba(X_test)[:, 1]
+        else:
+            y_score = model.predict(X_test)
+            if y_score.ndim > 1 and y_score.shape[1] > 1:
+                y_score = y_score[:, 1]
+            else:
+                y_score = y_score.ravel()
+
+    # Compute evaluation metrics
+    acc = accuracy_score(y_test, y_pred)
+    prec = precision_score(y_test, y_pred, zero_division=0)
+    rec = recall_score(y_test, y_pred, zero_division=0)
+    f1 = f1_score(y_test, y_pred, zero_division=0)
+    avrg = (acc + prec + rec + f1) / 4
+
+    print(f"\nAccuracy: {acc:.4f}")
+    print(f"Precision: {prec:.4f}")
+    print(f"Recall: {rec:.4f}")
+    print(f"F1 Score: {f1:.4f}")
+    print(f"Average (acc, prec, rec, f1): {avrg:.4f}")
+
+    # Confusion Matrix
+    cm = confusion_matrix(y_test, y_pred)
+    plt.figure(figsize=(6, 4))
+    sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=["Normal", "Attack"], yticklabels=["Normal", "Attack"])
+    plt.xlabel("Predicted")
+    plt.ylabel("Actual")
+    plt.title("Confusion Matrix")
+    plt.savefig("confusion_matrix.png")
+
+    # ROC Curve
+    fpr, tpr, _ = roc_curve(y_test, y_score)
+    roc_auc = auc(fpr, tpr)
+
+    plt.figure(figsize=(6, 4))
+    plt.plot(fpr, tpr, color="darkorange", lw=2, label=f"ROC curve (AUC = {roc_auc:.2f})")
+    plt.plot([0, 1], [0, 1], color="navy", lw=2, linestyle="--")
+    plt.xlabel("False Positive Rate")
+    plt.ylabel("True Positive Rate")
+    plt.title("Receiver Operating Characteristic")
+    plt.legend(loc="lower right")
+    plt.grid(True)
+    plt.savefig("roc_curve.png")
+
+    return acc, prec, rec, f1, avrg
+
+def test_normal_atk(y_test,y_pred):
+    df = pd.DataFrame()
+    df['y_test'] = y_test
+    df['y_pred'] = y_pred
+    
+    normal = len(df.query('y_test == 0'))
+    atk = len(y_test)-normal
+    
+    wrong = df.query('y_test != y_pred')
+    
+    normal_detect_rate = (normal - wrong.groupby('y_test').count().iloc[0][0]) / normal
+    atk_detect_rate = (atk - wrong.groupby('y_test').count().iloc[1][0]) / atk
+    
+    #print(normal_detect_rate,atk_detect_rate)
+    
+    return normal_detect_rate, atk_detect_rate
+    
 
 
-# def train_test(samples):
+def train_test(samples):
     
     
-#     # Specify the data 
-#     X=samples.iloc[:,0:(samples.shape[1]-1)]
+    # Specify the data 
+    X=samples.iloc[:,0:(samples.shape[1]-1)]
     
-#     # Specify the target labels and flatten the array
-#     #y= np.ravel(amostras.type)
-#     y= samples.iloc[:,-1]
+    # Specify the target labels and flatten the array
+    #y= np.ravel(amostras.type)
+    y= samples.iloc[:,-1]
     
-#     # Split the data up in train and test sets
-#     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
+    # Split the data up in train and test sets
+    X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.33, random_state=42)
     
-#     return X_train, X_test, y_train, y_test
+    return X_train, X_val, y_train, y_val
 
 
 # normalize input data
 
-def normalize_data(X_train,X_test, X_vals):
-    
+def normalize_data(X_train,X_test,X_val):
+    # Import `StandardScaler` from `sklearn.preprocessing`
     
     # Define the scaler 
     #scaler = StandardScaler().fit(X_train)
@@ -85,13 +199,11 @@ def normalize_data(X_train,X_test, X_vals):
     
     # Scale the test set
     X_test = scaler.transform(X_test)
-    
     # Scale the validation set
-    X_vals = scaler.transform(X_vals)
+    X_val = scaler.transform(X_val)
     
-    return X_train, X_test, X_vals
+    return X_train, X_test, X_val
 
-# Reshape data input
 
 def format_3d(df):
     
@@ -100,263 +212,95 @@ def format_3d(df):
 
 def format_2d(df):
     
-    return np.array(df).flatten()
+    X = np.array(df)
+    return np.reshape(X, (X.shape[0], X.shape[1]))
 
-def compile_train(model, X_train, y_train, X_val, y_val, maxEpoch, minPeers, deep=True, model_name=None, graph_path=None):
-    # Get model name if not provided
-    if model_name is None:
-        model_name = model.__class__.__name__
-    
-    if deep:
-        model.compile(loss='binary_crossentropy',
-                    optimizer='adam',
-                    metrics=['accuracy'])
-        
-        # Prepare validation data specifically for adaptive data sharing
-        # Ensure proper formatting for GRU model
-        X_val_3d = format_3d(X_val)
-        y_val_2d = format_2d(y_val)
-        
-        # Create validation dataset tuple for SwarmCallback
-        Valdata = (X_val_3d, y_val_2d)
-        
-        # Monitor validation metrics during training
-        print(f"Validation data shape for SwarmCallback: X={X_val_3d.shape}, y={y_val_2d.shape}")
+def load_and_prepare_data(train_path, test_path):
+    # Load full dataset
+    samples = pd.read_csv(train_path, sep=',')
+    X_train, X_val, y_train, y_val = train_test(samples)
 
-        early_stopping = EarlyStopping(
-            monitor='val_loss',
-            patience=3,
-            restore_best_weights=True
-        )
-        
-        # Swarm learning callback with proper validation data
-        swarm_callback = SwarmCallback(
-            syncFrequency=1024,              # Sync after every 10 batches
-            minPeers=minPeers,             # Minimum number of peers to sync
-            useAdaptiveSync=False,          # Disable adaptive sync
-            adsValData=Valdata,           # Properly formatted validation data
-            adsValBatchSize=512,    # Use the global batch_size variable
-            mergeMethod='coordmedian',            # Method for model merging
-            # nodeWeightage=18,            # Weight for model averaging
-            # Add logging to see what's happening during training
-            logDir=os.path.join(os.getenv('SCRATCH_DIR', '/platform/scratch'), 'swarm_logs')
-        )
-        
-        # Set logging level for better visibility
-        swarm_callback.logger.setLevel(logging.DEBUG)
-        
-        # Format training data properly for GRU model
-        X_train_3d = format_3d(X_train)
-        y_train_2d = format_2d(y_train)
-        
-        # Train the model with SwarmCallback
-        history = model.fit(
-            X_train_3d, 
-            y_train_2d, 
-            epochs=maxEpoch, 
-            batch_size=batch_size, 
-            verbose=1,
-            callbacks=[swarm_callback, early_stopping]
-        )
-        
-        # # summarize history for accuracy
-        # plt.figure(figsize=(10, 4))
-        # plt.subplot(1, 2, 1)
-        # plt.plot(history.history['accuracy'])  # Updated from 'acc' to 'accuracy'
-        # plt.title('Model Accuracy')
-        # plt.ylabel('Accuracy')
-        # plt.xlabel('Epoch')
-        # plt.legend(['train'], loc='upper left')
-        
-        # # summarize history for loss
-        # plt.subplot(1, 2, 2)
-        # plt.plot(history.history['loss'])
-        # plt.title('Model Loss')
-        # plt.ylabel('Loss')
-        # plt.xlabel('Epoch')
-        # plt.legend(['train'], loc='upper left')
-        # plt.tight_layout()
-        # plt.show()
+    # Concatenate X and y to perform upsampling
+    X = pd.concat([X_train, y_train], axis=1)
 
-        # plt.savefig(graph_path)
+    # Split by label
+    normal = X[X[' Label'] == 0]
+    ddos = X[X[' Label'] != 0]
 
-        # print(model.metrics_names)
+    # Upsample minority class
+    normal_upsampled = resample(
+        normal,
+        replace=True,
+        n_samples=len(ddos),
+        random_state=27
+    )
 
-        print("History keys:", history.history.keys())
-
-        
-        return model
-    else:
-        # For non-deep learning models
-        model.fit(X_train, y_train)
-        
-        # Save the model using joblib
-        try:
-            model_path = os.path.join('models', f"{model_name}.joblib")
-            joblib.dump(model, model_path)
-            print(f"Model saved to {model_path}")
-        except Exception as e:
-            print(f"Warning: Could not save model. Error: {e}")
-            print("Make sure 'joblib' is installed: pip install joblib")
-    
-    print('Model Compiled and Trained')
-    return model
-
-# Testing performance outcomes of the methods
-
-# def testes(model,X_test,y_test,y_pred, deep=True):
-#     if(deep==True): 
-#         score = model.evaluate(X_test, y_test,verbose=1)
-
-#         print(score)
-#     # Alguns testes adicionais
-#     #y_test = formatar2d(y_test)
-#     #y_pred = formatar2d(y_pred)
-#     # Import the modules from `sklearn.metrics`
-#     # Accuracy 
-#     acc = accuracy_score(y_test, y_pred)
-#     print('\nAccuracy')
-#     print(acc)
-#     # Precision 
-#     prec = precision_score(y_test, y_pred)#,average='macro')
-#     print('\nPrecision')
-#     print(prec)
-#     # Recall
-#     rec = recall_score(y_test, y_pred) #,average='macro')
-#     print('\nRecall')
-#     print(rec)
-#     # F1 score
-#     f1 = f1_score(y_test,y_pred) #,average='macro')
-#     print('\nF1 Score')
-#     print(f1)
-#     #average
-#     avrg = (acc+prec+rec+f1)/4
-#     print('\nAverage (acc, prec, rec, f1)')
-#     print(avrg)
-#     return acc, prec, rec, f1, avrg
-
-# def test_normal_atk(y_test,y_pred):
-#     df = pd.DataFrame()
-#     df['y_test'] = y_test
-#     df['y_pred'] = y_pred
-    
-#     normal = len(df.query('y_test == 0'))
-#     atk = len(y_test)-normal
-    
-#     wrong = df.query('y_test != y_pred')
-    
-#     normal_detect_rate = (normal - wrong.groupby('y_test').count().iloc[0][0]) / normal
-#     atk_detect_rate = (atk - wrong.groupby('y_test').count().iloc[1][0]) / atk
-    
-#     #print(normal_detect_rate,atk_detect_rate)
-    
-#     return normal_detect_rate, atk_detect_rate
-    
-def train_samples(input_file):    
-    # UPSAMPLE OF NORMAL FLOWS
-    samples = pd.read_csv(input_file, sep=',')
-
-    # Split features and target
-    X = samples.drop(' Label', axis=1)  # Features
-    y = samples[' Label']               # Target variable
-
-    # Recombine features and target
-    combined_data = pd.concat([X, y], axis=1)
-
-    # Separate benign and attack samples
-    is_benign = combined_data[' Label'] == 0
-    normal = combined_data[is_benign]
-    ddos = combined_data[~is_benign]
-
-    # Upsample benign to match number of attack samples
-    normal_upsampled = resample(normal,
-                                replace=True,
-                                n_samples=len(ddos),
-                                random_state=27)
-
-    # Combine upsampled benign and attack samples
     upsampled = pd.concat([normal_upsampled, ddos])
-
-    # Separate features and labels for training
     X_train = upsampled.iloc[:, :-1]
     y_train = upsampled.iloc[:, -1]
 
-    input_size = (X_train.shape[1], 1)
-    print('input_size:', input_size)
-    print('X_train shape:', X_train.shape)
+    print("Counts after upsampling:")
+    print(y_train.value_counts())
 
-    # ✅ Print class distribution
-    print("\nValue counts for 'Label' after upsampling:")
-    print(upsampled[' Label'].value_counts())
+    # Load separate test day dataset
+    test_data = pd.read_csv(test_path, sep=',')
+    X_test = test_data.iloc[:, :-1]
+    y_test = test_data.iloc[:, -1]
 
-    return X_train, y_train
+    print("Test set shape:", X_test.shape, y_test.shape)
+    print("Counts in final test set:")
+    print(y_test.value_counts())
 
-def val_test_samples(input_file):
-    tests_val = pd.read_csv(input_file, sep=',')
+    print("Validation set shape:", X_val.shape, y_val.shape)
+    print("Counts in final validation set:")
+    print(y_test.value_counts())
 
-    # X_test = np.concatenate((X_test,(tests.iloc[:,0:(tests.shape[1]-1)]).to_numpy())) # testar 33% + dia de testes
-    # y_test = np.concatenate((y_test,tests.iloc[:,-1]))
+    # Normalize the features
+    X_train, X_test, X_val = normalize_data(X_train, X_test, X_val )
 
-    X_test_val = tests_val.iloc[:,0:(tests_val.shape[1]-1)]                        
-    y_test_val = tests_val.iloc[:,-1]
+    return X_train, X_test, y_train, y_test, X_val, y_val
 
-    print((y_test_val.shape))
-    print((X_test_val.shape))
 
-    # X_train, X_test = normalize_data(X_train,X_test)
-    return X_test_val, y_test_val
+def train_and_evaluate(X_train, y_train, X_test, y_test, X_val, y_val, maxEpochs, minPeers):
+    
+    swarm_callback = SwarmCallback(
+        syncFrequency=128,
+        minPeers=minPeers,
+        useAdaptiveSync=False,
+        val_data=(X_val, y_val),
+        node_weightage=1
+    )
 
-# def evaluate_model(model, X_test, y_test):
-#     # Combine features and labels into one DataFrame for balancing
-#     df = pd.concat([X_test.reset_index(drop=True), pd.Series(y_test, name='Label')], axis=1)
+    model = GRU_model(X_train.shape[1])
+    model = compile_train(model, format_3d(X_train), y_train, format_3d(X_val), y_val, maxEpochs, swarm_callback, deep=True)
 
-#     # Separate benign (0) and attack (1 or others)
-#     normal = df[df['Label'] == 0]
-#     attack = df[df['Label'] != 0]
+    y_pred = model.predict(format_3d(X_test)).round()
+    norm, atk = test_normal_atk(y_test, y_pred)
+    acc, prec, rec, f1, avrg = testes(model, format_3d(X_test), y_test, y_pred, True)
 
-#     # Upsample benign to match attack count
-#     normal_upsampled = resample(normal,
-#                                 replace=True,
-#                                 n_samples=len(attack),
-#                                 random_state=27)
+    results = pd.DataFrame([{
+        'Method': 'GRU',
+        'Accuracy': acc,
+        'Precision': prec,
+        'Recall': rec,
+        'F1_Score': f1,
+        'Average': avrg,
+        'Normal_Detect_Rate': norm,
+        'Atk_Detect_Rate': atk
+    }])
 
-#     # Combine back to balanced dataframe
-#     balanced_df = pd.concat([normal_upsampled, attack])
+    return results
 
-#     # Shuffle balanced dataset to avoid ordering bias
-#     balanced_df = balanced_df.sample(frac=1, random_state=27).reset_index(drop=True)
 
-#     # Separate balanced features and labels
-#     y_balanced = balanced_df['Label']
-#     X_balanced = balanced_df.drop(columns=['Label'])
+defaultMaxEpoch = 10
+defaultMinPeers = 2
 
-#     # Predict using the model (assumes your format_3d function reshapes X properly)
-#     y_pred_prob = model.predict(format_3d(X_balanced))
-#     y_pred = y_pred_prob.round()
+trainFileName = 'train_set_2_proc.csv'
+testFileName = 'test_set_proc.csv'
 
-#     # Prepare results dataframe
-#     results = pd.DataFrame(columns=['Method','Accuracy','Precision','Recall', 'F1_Score', 'Average','Normal_Detect_Rate','Atk_Detect_Rate'])
-
-#     # Calculate metrics - assumes your testes() and test_normal_atk() functions exist and work with these inputs
-#     acc, prec, rec, f1, avrg = testes(model, format_3d(X_balanced), y_balanced, y_pred)
-#     norm, atk = test_normal_atk(y_balanced, y_pred)
-
-#     new_row = pd.DataFrame([{
-#         'Method': 'GRU',
-#         'Accuracy': acc,
-#         'Precision': prec,
-#         'F1_Score': f1,
-#         'Recall': rec,
-#         'Average': avrg,
-#         'Normal_Detect_Rate': norm,
-#         'Atk_Detect_Rate': atk
-#     }])
-
-#     results = pd.concat([results, new_row], ignore_index=True)
-#     return results
 
 def main():
-    modelName = 'GRU'
+
     dataDir = os.getenv('DATA_DIR', '/platform/data')
     scratchDir = os.getenv('SCRATCH_DIR', '/platform/scratch')
     os.makedirs(scratchDir, exist_ok=True)
@@ -364,48 +308,22 @@ def main():
     maxEpoch = int(os.getenv('MAX_EPOCHS', str(defaultMaxEpoch)))
     minPeers = int(os.getenv('MIN_PEERS', str(defaultMinPeers)))
 
-    # train_file = './01-12/export_dataframe_proc.csv'
-    # test_file = './01-12/export_tests_proc.csv'
-    # val_file = './01-12/export_vals_proc.csv'
-    
     train_file = os.path.join(dataDir, trainFileName)
     test_file = os.path.join(dataDir, testFileName)
-    val_file = os.path.join(dataDir, valFileName)
+
+    # train_path = './01-12/train_set_1_proc.csv'
+    # test_path = './01-12/test_set_proc.csv'
+
+    print("Loading and preparing data...")
+    X_train, X_test, y_train, y_test, X_val, y_val = load_and_prepare_data(train_file, test_file)
+
+    print("Training and evaluating GRU model...")
+    results = train_and_evaluate(X_train, y_train, X_test, y_test, X_val, y_val, maxEpoch, minPeers)
+
+    results.to_csv('gru_ddos_results.csv', index=False)
+    print("Results saved to 'gru_ddos_results.csv'")
+    print(results)
 
 
-    X_train, y_train = train_samples(train_file)
-    X_test, y_test = val_test_samples(test_file)
-    X_val, y_val = val_test_samples(val_file)
-    X_train, X_test, X_val = normalize_data(X_train, X_test, X_val)
-
-    # graph_path = os.path.join(scratchDir, modelName + '_training_graph.png')
-
-     # ✅ Print preview of datasets
-    print(f"\n--- Sample of Training Data ({train_file}) ---")
-    print("X_train:\n", X_train[:3])
-    print("y_train:\n", y_train[:3])
-
-    print(f"\n--- Sample of Validation Data ({val_file}) ---")
-    print("X_val:\n", X_val[:3])
-    print("y_val:\n", y_val[:3])
-
-    print(f"\n--- Sample of Test Data ({test_file}) ---")
-    print("X_test:\n", X_test[:3])
-    print("y_test:\n", y_test[:3])
-
-    print('***** Starting model =', modelName)
-    model_gru = GRU_model(X_train.shape[1])
-    final_model = compile_train(model_gru,X_train,y_train, X_val, y_val, maxEpoch, minPeers, model_name='GRU')
-
-    # # Evaluate the model
-    # results = evaluate_model(final_model, X_test, y_test)
-    # print('***** Results:')
-    # print(results)
-
-    model_path = os.path.join(scratchDir, modelName)
-    final_model.save(os.path.join(model_path, modelName + '.h5'))
-    print(f"Saved the trained model to: {model_path}")
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
-
