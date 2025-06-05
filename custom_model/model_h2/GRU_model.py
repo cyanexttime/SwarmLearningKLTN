@@ -62,7 +62,7 @@ def compile_train(model,X_train,y_train, X_val, y_val, maxEpochs, swarm_callback
         #model.fit(X_train, y_train,epochs=3)
 
         # summarize history for accuracy
-        plt.plot(history.history['accuracy'])
+        plt.plot(history.history['acc'])
         plt.title('model accuracy')
         plt.ylabel('accuracy')
         plt.xlabel('epoch')
