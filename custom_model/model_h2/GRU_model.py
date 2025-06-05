@@ -51,7 +51,7 @@ def compile_train(model,X_train,y_train, X_val, y_val, maxEpochs, swarm_callback
         if swarm_callback is not None:
             callbacks.append(swarm_callback)
 
-        history = model.fit(
+        model.fit(
             X_train, y_train,
             validation_data=(X_val, y_val) if X_val is not None and y_val is not None else None,
             epochs=maxEpochs,
@@ -61,21 +61,21 @@ def compile_train(model,X_train,y_train, X_val, y_val, maxEpochs, swarm_callback
         )
         #model.fit(X_train, y_train,epochs=3)
 
-        # summarize history for accuracy
-        plt.plot(history.history['acc'])
-        plt.title('model accuracy')
-        plt.ylabel('accuracy')
-        plt.xlabel('epoch')
-        plt.legend(['train'], loc='upper left')
-        plt.savefig("model_accuracy.png")
-        # summarize history for loss
-        plt.plot(history.history['loss'])
-        plt.title('model loss')
-        plt.ylabel('loss')
-        plt.xlabel('epoch')
-        plt.legend(['train'], loc='upper left')
-        plt.savefig("model_loss.png")
-        plt.close()
+        # # summarize history for accuracy
+        # plt.plot(history.history['acc'])
+        # plt.title('model accuracy')
+        # plt.ylabel('accuracy')
+        # plt.xlabel('epoch')
+        # plt.legend(['train'], loc='upper left')
+        # plt.savefig("model_accuracy.png")
+        # # summarize history for loss
+        # plt.plot(history.history['loss'])
+        # plt.title('model loss')
+        # plt.ylabel('loss')
+        # plt.xlabel('epoch')
+        # plt.legend(['train'], loc='upper left')
+        # plt.savefig("model_loss.png")
+        # plt.close()
         print(model.metrics_names)
     
     else:
