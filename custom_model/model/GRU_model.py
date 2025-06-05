@@ -2,6 +2,10 @@ import logging
 import os
 import pandas as pd
 import numpy as np
+
+import matplotlib
+matplotlib.use('Agg')
+
 from sklearn.utils import resample
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, roc_curve, auc
 import seaborn as sns
