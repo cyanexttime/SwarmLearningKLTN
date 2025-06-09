@@ -88,7 +88,7 @@ def compile_train(model,X_train,y_train, X_val, y_val, maxEpochs, swarm_callback
     print('Model Compiled and Trained')
     return model
 
-def testes(model, X_test, y_test, y_pred=None, deep=True, threshold=0.5):
+def testes(model, X_test, y_test, y_pred=None, deep=True, threshold=0.8):
     # Evaluate deep learning model if applicable
     if deep:
         score = model.evaluate(X_test, y_test, verbose=1)
@@ -155,6 +155,7 @@ def testes(model, X_test, y_test, y_pred=None, deep=True, threshold=0.5):
     plt.savefig("roc_curve.png")
     plt.close()
 
+    plt.close('all')
     return acc, prec, rec, f1, avrg
 
 def test_normal_atk(y_test,y_pred):
