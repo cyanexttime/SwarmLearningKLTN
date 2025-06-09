@@ -271,11 +271,11 @@ def load_and_prepare_data(train_path, test_path):
 def train_and_evaluate(X_train, y_train, X_test, y_test, X_val, y_val, maxEpochs, minPeers):
     
     swarm_callback = SwarmCallback(
-        syncFrequency=128,
+        syncFrequency=512,
         minPeers=minPeers,
         useAdaptiveSync=False,
         adsValData=(format_3d(X_val), y_val),
-        adsValBatchSize=32,
+        adsValBatchSize=256,
         mergeMethod='mean',
         node_weightage=1,
         logDir=os.path.join(os.getenv('SCRATCH_DIR', '/platform/scratch'), 'swarm_logs')
