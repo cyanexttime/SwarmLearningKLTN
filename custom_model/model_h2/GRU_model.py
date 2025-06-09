@@ -287,6 +287,7 @@ def train_and_evaluate(X_train, y_train, X_test, y_test, X_val, y_val, maxEpochs
     model = GRU_model(X_train.shape[1])
     model = compile_train(model, format_3d(X_train), y_train, format_3d(X_val), y_val, maxEpochs, swarm_callback, deep=True)
 
+
     y_pred = model.predict(format_3d(X_test)).round()
     norm, atk = test_normal_atk(y_test, y_pred)
     acc, prec, rec, f1, avrg = testes(model, format_3d(X_test), y_test, y_pred, True)
@@ -302,7 +303,7 @@ def train_and_evaluate(X_train, y_train, X_test, y_test, X_val, y_val, maxEpochs
         'Atk_Detect_Rate': atk
     }])
 
-    return results
+    return results, model
 
 
 defaultMaxEpoch = 10
@@ -331,11 +332,16 @@ def main():
     X_train, X_test, y_train, y_test, X_val, y_val = load_and_prepare_data(train_file, test_file)
 
     print("Training and evaluating GRU model...")
-    results = train_and_evaluate(X_train, y_train, X_test, y_test, X_val, y_val, maxEpoch, minPeers)
+    results, model = train_and_evaluate(X_train, y_train, X_test, y_test, X_val, y_val, maxEpoch, minPeers)
 
     results.to_csv('gru_ddos_results.csv', index=False)
     print("Results saved to 'gru_ddos_results.csv'")
     print(results)
+
+    # Save the trained model
+    model_path = os.path.join(scratchDir, 'gru_model.h5')
+    model.save(model_path)
+    print(f"Model saved to {model_path}")
 
 
 if __name__ == '__main__':
