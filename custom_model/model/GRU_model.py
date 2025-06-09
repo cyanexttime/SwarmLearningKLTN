@@ -268,7 +268,7 @@ def load_and_prepare_data(train_path, test_path):
     return X_train, X_test, y_train, y_test, X_val, y_val
 
 
-def train_and_evaluate(X_train, y_train, X_test, y_test, X_val, y_val, maxEpochs, minPeers):
+def train_and_evaluate(X_train, y_train, X_test, y_test, X_val, y_val, maxEpochs, minPeers, save_path):
     
     swarm_callback = SwarmCallback(
         syncFrequency=512,
@@ -291,6 +291,9 @@ def train_and_evaluate(X_train, y_train, X_test, y_test, X_val, y_val, maxEpochs
     norm, atk = test_normal_atk(y_test, y_pred)
     acc, prec, rec, f1, avrg = testes(model, format_3d(X_test), y_test, y_pred, True)
 
+    model.save(save_path)
+    print(f"Model saved to {save_path}")
+
     results = pd.DataFrame([{
         'Method': 'GRU',
         'Accuracy': acc,
@@ -302,7 +305,7 @@ def train_and_evaluate(X_train, y_train, X_test, y_test, X_val, y_val, maxEpochs
         'Atk_Detect_Rate': atk
     }])
 
-    return results, model
+    return results
 
 
 defaultMaxEpoch = 10
@@ -318,6 +321,9 @@ def main():
     scratchDir = os.getenv('SCRATCH_DIR', '/platform/scratch')
     os.makedirs(scratchDir, exist_ok=True)
 
+    # Save the trained model
+    save_path = os.path.join(scratchDir, 'gru_model.h5')
+
     maxEpoch = int(os.getenv('MAX_EPOCHS', str(defaultMaxEpoch)))
     minPeers = int(os.getenv('MIN_PEERS', str(defaultMinPeers)))
 
@@ -331,16 +337,14 @@ def main():
     X_train, X_test, y_train, y_test, X_val, y_val = load_and_prepare_data(train_file, test_file)
 
     print("Training and evaluating GRU model...")
-    results, model = train_and_evaluate(X_train, y_train, X_test, y_test, X_val, y_val, maxEpoch, minPeers)
+    results = train_and_evaluate(X_train, y_train, X_test, y_test, X_val, y_val, maxEpoch, minPeers, save_path)
 
     results.to_csv('gru_ddos_results.csv', index=False)
     print("Results saved to 'gru_ddos_results.csv'")
     print(results)
 
-    # Save the trained model
-    model_path = os.path.join(scratchDir, 'gru_model.h5')
-    model.save(model_path)
-    print(f"Model saved to {model_path}")
+    
+    
 
 
 if __name__ == '__main__':
