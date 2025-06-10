@@ -272,7 +272,7 @@ def load_and_prepare_data(train_path, test_path):
 def train_and_evaluate(X_train, y_train, X_test, y_test, X_val, y_val, maxEpochs, minPeers, save_path):
     
     swarm_callback = SwarmCallback(
-        syncFrequency=512,
+        syncFrequency=1024,
         minPeers=minPeers,
         useAdaptiveSync=False,
         adsValData=(format_3d(X_val), y_val),
