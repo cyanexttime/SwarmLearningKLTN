@@ -290,7 +290,7 @@ def train_and_evaluate(X_train, y_train, X_test, y_test, X_val, y_val, maxEpochs
     model = GRU_model(X_train.shape[1])
     model = compile_train(model, format_3d(X_train), y_train, format_3d(X_val), y_val, maxEpochs, swarm_callback, deep=True)
 
-    tf.keras.models.save_model(model, save_path, save_format="tf")  # <-- updated save call
+    tf.keras.models.save_model(model, save_path, save_format="h5")  # <-- updated save call
     print(f"Model saved to {save_path}")
 
     y_pred = model.predict(format_3d(X_test)).round()
@@ -325,7 +325,7 @@ def main():
     os.makedirs(scratchDir, exist_ok=True)
 
     # Save the trained model
-    save_path = os.path.join(scratchDir, 'gru_model_savedmodel')
+    save_path = os.path.join(scratchDir, 'gru_model.h5')
 
     maxEpoch = int(os.getenv('MAX_EPOCHS', str(defaultMaxEpoch)))
     minPeers = int(os.getenv('MIN_PEERS', str(defaultMinPeers)))
