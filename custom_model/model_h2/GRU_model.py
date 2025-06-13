@@ -273,14 +273,15 @@ def load_and_prepare_data(train_path, test_path):
 def train_and_evaluate(X_train, y_train, X_test, y_test, X_val, y_val, maxEpochs, minPeers, save_path):
     
     swarm_callback = SwarmCallback(
-        syncFrequency=1024,
-        minPeers=minPeers,
-        useAdaptiveSync=False,
-        adsValData=(format_3d(X_val), y_val),
-        adsValBatchSize=256,
-        mergeMethod='mean',
-        node_weightage=1,
-        logDir=os.path.join(os.getenv('SCRATCH_DIR', '/platform/scratch'), 'swarm_logs')
+        syncFrequency=1024,  # Number of training samples after which peers sync their model weights
+        minPeers=minPeers,  # Minimum number of active peers required to perform synchronization
+        useAdaptiveSync=False,  # Disable adaptive sync; use fixed sync frequency instead
+        adsValData=(format_3d(X_val), y_val),  # Validation data for Adaptive Sync and model merging decision
+        adsValBatchSize=256,  # Batch size used during validation at sync points
+        mergeMethod='mean',  # Aggregation method to merge model weights from different peers
+        node_weightage=1,  # Equal weightage given to this node's model when averaging
+        logDir=os.path.join(
+        os.getenv('SCRATCH_DIR', '/platform/scratch'),'swarm_logs')  # Directory path to store Swarm logs
     )
 
     # Set logging level for better visibility
