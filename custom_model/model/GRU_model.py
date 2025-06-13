@@ -1,5 +1,6 @@
 import logging
 import os
+import pickle
 import pandas as pd
 import numpy as np
 import tensorflow as tf
@@ -195,19 +196,18 @@ def train_test(samples):
 
 # normalize input data
 
-def normalize_data(X_train,X_test,X_val):
+def normalize_data(X_train,X_test,X_val, scaler_path='scaler.pkl'):
     # Import `StandardScaler` from `sklearn.preprocessing`
     
-    # Define the scaler 
-    #scaler = StandardScaler().fit(X_train)
     scaler = MinMaxScaler(feature_range=(-1, 1)).fit(X_train)
-    
-    # Scale the train set
+
+    # Save the scaler to file
+    with open(scaler_path, 'wb') as f:
+        pickle.dump(scaler, f)
+
+    # Transform the datasets
     X_train = scaler.transform(X_train)
-    
-    # Scale the test set
     X_test = scaler.transform(X_test)
-    # Scale the validation set
     X_val = scaler.transform(X_val)
     
     return X_train, X_test, X_val
@@ -223,7 +223,7 @@ def format_2d(df):
     X = np.array(df)
     return np.reshape(X, (X.shape[0], X.shape[1]))
 
-def load_and_prepare_data(train_path, test_path):
+def load_and_prepare_data(train_path, test_path, scaler_path):
     # Load full dataset
     samples = pd.read_csv(train_path, sep=',')
     X_train, X_val, y_train, y_val = train_test(samples)
@@ -264,7 +264,7 @@ def load_and_prepare_data(train_path, test_path):
     print(y_test.value_counts())
 
     # Normalize the features
-    X_train, X_test, X_val = normalize_data(X_train, X_test, X_val )
+    X_train, X_test, X_val = normalize_data(X_train, X_test, X_val, scaler_path)
 
     return X_train, X_test, y_train, y_test, X_val, y_val
 
@@ -336,7 +336,8 @@ def main():
     # test_path = './01-12/test_set_proc.csv'
 
     print("Loading and preparing data...")
-    X_train, X_test, y_train, y_test, X_val, y_val = load_and_prepare_data(train_file, test_file)
+    X_train, X_test, y_train, y_test, X_val, y_val = load_and_prepare_data(train_file, test_file, scaler_path=os.path.join(scratchDir, 'scaler.pkl'))
+    print("Data loaded and prepared.")
 
     print("Training and evaluating GRU model...")
     results = train_and_evaluate(X_train, y_train, X_test, y_test, X_val, y_val, maxEpoch, minPeers, save_path)
