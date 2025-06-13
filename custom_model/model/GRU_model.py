@@ -289,13 +289,15 @@ def train_and_evaluate(X_train, y_train, X_test, y_test, X_val, y_val, maxEpochs
     model = GRU_model(X_train.shape[1])
     model = compile_train(model, format_3d(X_train), y_train, format_3d(X_val), y_val, maxEpochs, swarm_callback, deep=True)
 
-    tf.keras.models.save_model(model, save_path, save_format="h5")  # <-- updated save call
-    print(f"Model saved to {save_path}")
 
     y_pred = model.predict(format_3d(X_test)).round()
     norm, atk = test_normal_atk(y_test, y_pred)
     acc, prec, rec, f1, avrg = testes(model, format_3d(X_test), y_test, y_pred, True)
 
+    # Save the trained model
+    model.save(save_path)
+    print(f"Model saved to {save_path}")
+    
     results = pd.DataFrame([{
         'Method': 'GRU',
         'Accuracy': acc,
