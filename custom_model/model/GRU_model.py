@@ -261,7 +261,7 @@ def load_and_prepare_data(train_path, test_path, scaler_path):
 
     print("Validation set shape:", X_val.shape, y_val.shape)
     print("Counts in final validation set:")
-    print(y_test.value_counts())
+    print(y_val.value_counts())
 
     # Normalize the features
     X_train, X_test, X_val = normalize_data(X_train, X_test, X_val, scaler_path)
