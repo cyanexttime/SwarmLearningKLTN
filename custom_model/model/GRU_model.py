@@ -326,7 +326,7 @@ def main():
     os.makedirs(scratchDir, exist_ok=True)
 
     # Save the trained model
-    save_path = os.path.join(scratchDir, 'gru_model.keras')
+    save_path = os.path.join(scratchDir, 'gru_model.h5')
 
     maxEpoch = int(os.getenv('MAX_EPOCHS', str(defaultMaxEpoch)))
     minPeers = int(os.getenv('MIN_PEERS', str(defaultMinPeers)))
