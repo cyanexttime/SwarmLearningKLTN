@@ -294,7 +294,7 @@ def train_and_evaluate(X_train, y_train, X_test, y_test, X_val, y_val, maxEpochs
     norm, atk = test_normal_atk(y_test, y_pred)
     acc, prec, rec, f1, avrg = testes(model, format_3d(X_test), y_test, y_pred, True)
 
-    model.save(save_path) 
+    model.save(save_path)
     print(f"Model saved to {save_path}")
 
     results = pd.DataFrame([{
@@ -325,7 +325,7 @@ def main():
     os.makedirs(scratchDir, exist_ok=True)
 
     # Save the trained model
-    save_path = os.path.join(scratchDir, 'gru_model.keras')
+    save_path = os.path.join(scratchDir, 'gru_model.h5')
 
     maxEpoch = int(os.getenv('MAX_EPOCHS', str(defaultMaxEpoch)))
     minPeers = int(os.getenv('MIN_PEERS', str(defaultMinPeers)))
