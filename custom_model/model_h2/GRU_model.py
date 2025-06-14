@@ -331,8 +331,8 @@ def train_and_evaluate(X_train, y_train, X_test, y_test, X_val, y_val, maxEpochs
 defaultMaxEpoch = 10
 defaultMinPeers = 2
 
-trainFileName = 'h2_true_proc.csv'
-testFileName = 'test_true_proc.csv'
+trainFileName = 'h2_lite_true_proc.csv'
+testFileName = 'test_lite_true_proc.csv'
 
 
 def main():
