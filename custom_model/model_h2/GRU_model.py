@@ -180,17 +180,34 @@ def test_normal_atk(y_test,y_pred):
 
 
 def train_test(samples):
+    # # Separate features and labels
+    # X = samples.iloc[:, :-1]
+    # y = samples.iloc[:, -1]
+
+    # Combine for easy manipulation
+    data = samples.copy()
     
+    # Separate by class
+    class_0 = data[data.iloc[:, -1] == 0]
+    class_1 = data[data.iloc[:, -1] == 1]
     
-    # Specify the data 
-    X=samples.iloc[:,0:(samples.shape[1]-1)]
+    # Split each class into train and val (25% to validation)
+    train_0, val_0 = train_test_split(class_0, test_size=0.25, random_state=42)
+    train_1, val_1 = train_test_split(class_1, test_size=0.25, random_state=42)
     
-    # Specify the target labels and flatten the array
-    #y= np.ravel(amostras.type)
-    y= samples.iloc[:,-1]
+    # Combine training and validation sets
+    train_data = pd.concat([train_0, train_1], ignore_index=True)
+    val_data = pd.concat([val_0, val_1], ignore_index=True)
     
-    # Split the data up in train and test sets
-    X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.33, random_state=42)
+    # Shuffle both sets (optional but recommended)
+    train_data = train_data.sample(frac=1, random_state=42).reset_index(drop=True)
+    val_data = val_data.sample(frac=1, random_state=42).reset_index(drop=True)
+
+    # Split into features and labels
+    X_train = train_data.iloc[:, :-1]
+    y_train = train_data.iloc[:, -1]
+    X_val = val_data.iloc[:, :-1]
+    y_val = val_data.iloc[:, -1]
     
     return X_train, X_val, y_train, y_val
 
