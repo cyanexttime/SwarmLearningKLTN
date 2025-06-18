@@ -8,7 +8,7 @@ import matplotlib
 matplotlib.use('Agg')
 
 from sklearn.utils import resample
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, roc_curve, auc
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, roc_curve, auc, mean_absolute_error, mean_squared_error
 import seaborn as sns
 import matplotlib.pyplot as plt
 # Import required libraries
@@ -132,6 +132,16 @@ def testes(model, X_test, y_test, y_pred=None, deep=True, threshold=0.8):
     print(f"F1 Score: {f1:.4f}")
     print(f"Average (acc, prec, rec, f1): {avrg:.4f}")
 
+    # Regression-like metrics (based on predicted probabilities)
+    mae = mean_absolute_error(y_test, y_score)
+    mse = mean_squared_error(y_test, y_score)
+    rmse = np.sqrt(mse)
+    
+    print(f"\n--- Regression-style Metrics on Probabilities ---")
+    print(f"MAE:  {mae:.4f}")
+    print(f"MSE:  {mse:.4f}")
+    print(f"RMSE: {rmse:.4f}")
+
     # Confusion Matrix
     cm = confusion_matrix(y_test, y_pred)
     plt.figure(figsize=(6, 4))
@@ -157,7 +167,7 @@ def testes(model, X_test, y_test, y_pred=None, deep=True, threshold=0.8):
     plt.close()
 
     plt.close('all')
-    return acc, prec, rec, f1, avrg
+    return acc, prec, rec, f1, avrg, mae, mse, rmse
 
 def test_normal_atk(y_test,y_pred):
     df = pd.DataFrame()
@@ -307,12 +317,13 @@ def train_and_evaluate(X_train, y_train, X_test, y_test, X_val, y_val, maxEpochs
 
     y_pred = model.predict(format_3d(X_test)).round()
     norm, atk = test_normal_atk(y_test, y_pred)
-    acc, prec, rec, f1, avrg = testes(model, format_3d(X_test), y_test, y_pred, True)
+    acc, prec, rec, f1, avrg, mae, mse, rmse = testes(model, format_3d(X_test), y_test, y_pred, True)
 
     # Save the trained model
     model.save(save_path)
     print(f"Model saved to {save_path}")
 
+    # Store results in a DataFrame
     results = pd.DataFrame([{
         'Method': 'GRU',
         'Accuracy': acc,
@@ -321,9 +332,11 @@ def train_and_evaluate(X_train, y_train, X_test, y_test, X_val, y_val, maxEpochs
         'F1_Score': f1,
         'Average': avrg,
         'Normal_Detect_Rate': norm,
-        'Atk_Detect_Rate': atk
-    }])
-
+        'Atk_Detect_Rate': atk,
+        'MAE': mae,
+        'MSE': mse,
+        'RMSE': rmse,
+    }])  
     return results
 
 
