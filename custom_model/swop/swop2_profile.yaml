@@ -55,7 +55,7 @@ nodes:
       slport: 18000
       usrhostname: user2
       privatedata:
-        src: "/opt/hpe/swarm-learning/workspace/mnist/custom_dataset"
+        src: "/opt/hpe/swarm-learning/workspace/mnist/custom_dataset_new"
         mType: BIND
       slenvvars: null
       usrenvvars: [SCRATCH_DIR : "user2"]
