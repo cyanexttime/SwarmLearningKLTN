@@ -182,7 +182,7 @@ def main():
     # Save model
     print('Saving the final Swarm model ...')
     swarmCallback.logger.info('Saving the final Swarm model ...')
-    model_path = os.path.join(scratchDir, model_name)
+    model_path = os.path.join(modelDir, model_name)
     model.save(model_path)
     print('Saved the trained model!')
     swarmCallback.logger.info(f'Saved the trained model - {model_path}')
