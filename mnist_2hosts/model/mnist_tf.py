@@ -178,26 +178,36 @@ def main():
                       verbose=1,
                       callbacks=[swarmCallback])
 
+    # Check available history keys
+  print("History keys:", history.history.keys())
+
+  # Get metric names safely
+  acc_key = 'accuracy' if 'accuracy' in history.history else 'acc'
+  loss_key = 'loss'
+
   # Plot accuracy and loss
   plt.figure(figsize=(12, 5))
 
-  # Accuracy
-  plt.subplot(1, 2, 1)
-  plt.plot(history.history['accuracy'], label='Training Accuracy')
-  plt.title('Training Accuracy Over Epochs')
-  plt.xlabel('Epoch')
-  plt.ylabel('Accuracy')
-  plt.legend()
+  # Accuracy plot
+  if acc_key in history.history:
+      plt.subplot(1, 2, 1)
+      plt.plot(history.history[acc_key], label='Training Accuracy')
+      plt.title('Training Accuracy Over Epochs')
+      plt.xlabel('Epoch')
+      plt.ylabel('Accuracy')
+      plt.legend()
+  else:
+      print("Accuracy key not found in history. Skipping accuracy plot.")
 
-  # Loss
+  # Loss plot
   plt.subplot(1, 2, 2)
-  plt.plot(history.history['loss'], label='Training Loss', color='orange')
+  plt.plot(history.history[loss_key], label='Training Loss', color='orange')
   plt.title('Training Loss Over Epochs')
   plt.xlabel('Epoch')
   plt.ylabel('Loss')
   plt.legend()
 
-  # Save plots to scratchDir
+  # Save plots
   plot_path = os.path.join(scratchDir, 'training_plots.png')
   plt.savefig(plot_path)
   print(f'Training plots saved to {plot_path}')
