@@ -83,6 +83,7 @@ def main():
   
   swarmCallback = SwarmCallback(syncFrequency=128,
                                 minPeers=min_peers,
+                                mergeMethod='coordmedian',
                                 useAdaptiveSync=False,
                                 adsValData=(x_test, y_test),
                                 adsValBatchSize=8,
