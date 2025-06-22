@@ -49,7 +49,7 @@ def GRU_model(input_size):
 
 # compile and train learning model
 def compile_train(model,X_train,y_train, X_val, y_val, maxEpochs, swarm_callback=None, deep=True):
-    
+    history = None
     if(deep==True):
         model.compile(loss='binary_crossentropy',
                       optimizer='adam',
@@ -59,7 +59,7 @@ def compile_train(model,X_train,y_train, X_val, y_val, maxEpochs, swarm_callback
         if swarm_callback is not None:
             callbacks.append(swarm_callback)
 
-        model.fit(
+        history = model.fit(
             X_train, y_train,
             validation_data=(X_val, y_val) if X_val is not None and y_val is not None else None,
             epochs=maxEpochs,
@@ -90,7 +90,7 @@ def compile_train(model,X_train,y_train, X_val, y_val, maxEpochs, swarm_callback
         model.fit(X_train, y_train) #SVM, LR, GD
     
     print('Model Compiled and Trained')
-    return model
+    return model, history
 
 def testes(model, X_test, y_test, y_pred=None, deep=True, threshold=0.8):
     # Evaluate deep learning model if applicable
@@ -317,7 +317,37 @@ def train_and_evaluate(X_train, y_train, X_test, y_test, X_val, y_val, maxEpochs
     swarm_callback.logger.setLevel(logging.DEBUG)
 
     model = GRU_model(X_train.shape[1])
-    model = compile_train(model, format_3d(X_train), y_train, format_3d(X_val), y_val, maxEpochs, swarm_callback, deep=True)
+    model, history = compile_train(model, format_3d(X_train), y_train, format_3d(X_val), y_val, maxEpochs, swarm_callback, deep=True)
+
+    if history is not None:
+        hist = history.history
+        plt.figure(figsize=(12, 5))
+
+    if 'accuracy' in hist:
+        plt.subplot(1, 2, 1)
+        plt.plot(hist['accuracy'], label='Train Accuracy')
+        if 'val_accuracy' in hist:
+            plt.plot(hist['val_accuracy'], label='Val Accuracy')
+        plt.title('Accuracy over Epochs')
+        plt.xlabel('Epoch')
+        plt.ylabel('Accuracy')
+        plt.legend()
+
+    if 'loss' in hist:
+        plt.subplot(1, 2, 2)
+        plt.plot(hist['loss'], label='Train Loss')
+        if 'val_loss' in hist:
+            plt.plot(hist['val_loss'], label='Val Loss')
+        plt.title('Loss over Epochs')
+        plt.xlabel('Epoch')
+        plt.ylabel('Loss')
+        plt.legend()
+
+    plt.tight_layout()
+    plot_path = os.path.join(os.getenv('SCRATCH_DIR', '/platform/scratch'), 'training_history.png')
+    plt.savefig(plot_path)
+    print(f"Training history plot saved to: {plot_path}")
+    plt.close()
 
     y_pred = model.predict(format_3d(X_test)).round()
     norm, atk = test_normal_atk(y_test, y_pred)
@@ -343,7 +373,7 @@ def train_and_evaluate(X_train, y_train, X_test, y_test, X_val, y_val, maxEpochs
     return results
 
 
-defaultMaxEpoch = 10
+defaultMaxEpoch = 5
 defaultMinPeers = 2
 
 trainFileName = 'h2_lite_true_proc_added.csv'
