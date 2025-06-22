@@ -145,23 +145,20 @@ def testes(model, X_test, y_test, y_pred=None, deep=True, threshold=0.8):
     prec = precision_score(y_test, y_pred, zero_division=0)
     rec = recall_score(y_test, y_pred, zero_division=0)
     f1 = f1_score(y_test, y_pred, zero_division=0)
-    avrg = (acc + prec + rec + f1) / 4
-
     print(f"\nAccuracy: {acc:.4f}")
     print(f"Precision: {prec:.4f}")
     print(f"Recall: {rec:.4f}")
     print(f"F1 Score: {f1:.4f}")
-    print(f"Average (acc, prec, rec, f1): {avrg:.4f}")
 
-    # Regression-like metrics (based on predicted probabilities)
-    mae = mean_absolute_error(y_test, y_score)
-    mse = mean_squared_error(y_test, y_score)
-    rmse = np.sqrt(mse)
+    # # Regression-like metrics (based on predicted probabilities)
+    # mae = mean_absolute_error(y_test, y_score)
+    # mse = mean_squared_error(y_test, y_score)
+    # rmse = np.sqrt(mse)
 
-    print(f"\n--- Regression-style Metrics on Probabilities ---")
-    print(f"MAE:  {mae:.4f}")
-    print(f"MSE:  {mse:.4f}")
-    print(f"RMSE: {rmse:.4f}")
+    # print(f"\n--- Regression-style Metrics on Probabilities ---")
+    # print(f"MAE:  {mae:.4f}")
+    # print(f"MSE:  {mse:.4f}")
+    # print(f"RMSE: {rmse:.4f}")
 
     # Confusion Matrix
     cm = confusion_matrix(y_test, y_pred)
@@ -189,7 +186,7 @@ def testes(model, X_test, y_test, y_pred=None, deep=True, threshold=0.8):
     plt.close()
 
     plt.close('all')
-    return acc, prec, rec, f1, avrg, mae, mse, rmse
+    return acc, prec, rec, f1
 
 def test_normal_atk(y_test,y_pred):
     df = pd.DataFrame()
@@ -341,7 +338,7 @@ def train_and_evaluate(X_train, y_train, X_test, y_test, X_val, y_val, maxEpochs
 
     y_pred = model.predict(format_3d(X_test)).round()
     norm, atk = test_normal_atk(y_test, y_pred)
-    acc, prec, rec, f1, avrg, mae, mse, rmse = testes(model, format_3d(X_test), y_test, y_pred, True)
+    acc, prec, rec, f1 = testes(model, format_3d(X_test), y_test, y_pred, True)
 
     model.save(save_path)
     print(f"Model saved to {save_path}")
@@ -353,12 +350,8 @@ def train_and_evaluate(X_train, y_train, X_test, y_test, X_val, y_val, maxEpochs
         'Precision': prec,
         'Recall': rec,
         'F1_Score': f1,
-        'Average': avrg,
         'Normal_Detect_Rate': norm,
         'Atk_Detect_Rate': atk,
-        'MAE': mae,
-        'MSE': mse,
-        'RMSE': rmse,
     }])  
     return results
 
