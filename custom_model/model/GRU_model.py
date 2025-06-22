@@ -23,7 +23,7 @@ from sklearn.linear_model import LogisticRegression, SGDClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import StandardScaler,MinMaxScaler
 from swarmlearning.tf import SwarmCallback
-
+from keras.callbacks import History
 
 #input_size
 # -> CIC-DDoS2019 82
@@ -45,18 +45,19 @@ def GRU_model(input_size):
     return model
 
 # compile and train learning model
-def compile_train(model,X_train,y_train, X_val, y_val, maxEpochs, swarm_callback=None, deep=True):
-    history = None
+def compile_train(model,X_train,y_train, X_val, y_val, maxEpochs, swarm_callback=None, deep=True, save_path=None):
+    # Callbacks
+    history_callback = History()
     if(deep==True):
         model.compile(loss='binary_crossentropy',
                       optimizer='adam',
                       metrics=['accuracy'])
         
-        callbacks = []
+        callbacks = [history_callback]
         if swarm_callback is not None:
             callbacks.append(swarm_callback)
 
-        history = model.fit(
+        model.fit(
             X_train, y_train,
             validation_data=(X_val, y_val) if X_val is not None and y_val is not None else None,
             epochs=maxEpochs,
@@ -64,31 +65,49 @@ def compile_train(model,X_train,y_train, X_val, y_val, maxEpochs, swarm_callback
             verbose=1,
             callbacks=callbacks
         )
-        #model.fit(X_train, y_train,epochs=3)
+            # Plotting training metrics
+        hist = history_callback.history
+        print("History keys:", hist.keys())
 
-        # # summarize history for accuracy
-        # plt.plot(history.history['acc'])
-        # plt.title('model accuracy')
-        # plt.ylabel('accuracy')
-        # plt.xlabel('epoch')
-        # plt.legend(['train'], loc='upper left')
-        # plt.savefig("model_accuracy.png")
-        # # summarize history for loss
-        # plt.plot(history.history['loss'])
-        # plt.title('model loss')
-        # plt.ylabel('loss')
-        # plt.xlabel('epoch')
-        # plt.legend(['train'], loc='upper left')
-        # plt.savefig("model_loss.png")
-        # plt.close()
+        acc_key = 'accuracy' if 'accuracy' in hist else 'acc'
+        loss_key = 'loss'
 
-        print(model.metrics_names)
-    
+        plt.figure(figsize=(12, 5))
+
+        # Accuracy plot
+        if acc_key in hist:
+            plt.subplot(1, 2, 1)
+            plt.plot(hist[acc_key], label='Training Accuracy')
+            plt.title('Training Accuracy Over Epochs')
+            plt.xlabel('Epoch')
+            plt.ylabel('Accuracy')
+            plt.legend()
+        else:
+            print("Accuracy key not found. Skipping accuracy plot.")
+
+        # Loss plot
+        if loss_key in hist:
+            plt.subplot(1, 2, 2)
+            plt.plot(hist[loss_key], label='Training Loss', color='orange')
+            plt.title('Training Loss Over Epochs')
+            plt.xlabel('Epoch')
+            plt.ylabel('Loss')
+            plt.legend()
+        else:
+            print("Loss key not found. Skipping loss plot.")
+            print(model.metrics_names)
+        
+        # Save plots
+        if save_path is not None:
+            plot_path = os.path.join(save_path, 'training_plots.png')
+            plt.savefig(plot_path)
+            print(f'Training plots saved to {plot_path}')
+        
     else:
         model.fit(X_train, y_train) #SVM, LR, GD
     
     print('Model Compiled and Trained')
-    return model, history
+    return model
 
 def testes(model, X_test, y_test, y_pred=None, deep=True, threshold=0.8):
     # Evaluate deep learning model if applicable
@@ -312,37 +331,7 @@ def train_and_evaluate(X_train, y_train, X_test, y_test, X_val, y_val, maxEpochs
     swarm_callback.logger.setLevel(logging.DEBUG)
 
     model = GRU_model(X_train.shape[1])
-    model, history = compile_train(model, format_3d(X_train), y_train, format_3d(X_val), y_val, maxEpochs, swarm_callback, deep=True)
-
-    if history is not None:
-        hist = history.history
-        plt.figure(figsize=(12, 5))
-
-    if 'accuracy' in hist:
-        plt.subplot(1, 2, 1)
-        plt.plot(hist['accuracy'], label='Train Accuracy')
-        if 'val_accuracy' in hist:
-            plt.plot(hist['val_accuracy'], label='Val Accuracy')
-        plt.title('Accuracy over Epochs')
-        plt.xlabel('Epoch')
-        plt.ylabel('Accuracy')
-        plt.legend()
-
-    if 'loss' in hist:
-        plt.subplot(1, 2, 2)
-        plt.plot(hist['loss'], label='Train Loss')
-        if 'val_loss' in hist:
-            plt.plot(hist['val_loss'], label='Val Loss')
-        plt.title('Loss over Epochs')
-        plt.xlabel('Epoch')
-        plt.ylabel('Loss')
-        plt.legend()
-
-    plt.tight_layout()
-    plot_path = os.path.join(os.getenv('SCRATCH_DIR', '/platform/scratch'), 'training_history.png')
-    plt.savefig(plot_path)
-    print(f"Training history plot saved to: {plot_path}")
-    plt.close()
+    model = compile_train(model, format_3d(X_train), y_train, format_3d(X_val), y_val, maxEpochs, swarm_callback, deep=True, save_path=save_path)
 
     y_pred = model.predict(format_3d(X_test)).round()
     norm, atk = test_normal_atk(y_test, y_pred)
@@ -405,8 +394,6 @@ def main():
     print("Results saved to 'gru_ddos_results.csv'")
     print(results)
 
-    
-    #Save the model
     
 
 
