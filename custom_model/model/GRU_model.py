@@ -287,14 +287,11 @@ def load_and_prepare_data(train_path, test_path, scaler_path):
     samples = pd.read_csv(train_path, sep=',')
     X_train, X_val, y_train, y_val = train_test(samples)
 
-    # Concatenate X and y to perform upsampling
+    # ==== UPSAMPLE TRAINING DATA ====
     X = pd.concat([X_train, y_train], axis=1)
-
-    # Split by label
     normal = X[X[' Label'] == 0]
     ddos = X[X[' Label'] != 0]
 
-    # Upsample minority class
     normal_upsampled = resample(
         normal,
         replace=True,
@@ -306,10 +303,29 @@ def load_and_prepare_data(train_path, test_path, scaler_path):
     X_train = upsampled.iloc[:, :-1]
     y_train = upsampled.iloc[:, -1]
 
-    print("Counts after upsampling:")
+    print("Counts after upsampling (train):")
     print(y_train.value_counts())
 
-    # Load separate test day dataset
+    # ==== UPSAMPLE VALIDATION DATA ====
+    val = pd.concat([X_val, y_val], axis=1)
+    val_normal = val[val[' Label'] == 0]
+    val_ddos = val[val[' Label'] != 0]
+
+    val_normal_upsampled = resample(
+        val_normal,
+        replace=True,
+        n_samples=len(val_ddos),
+        random_state=27
+    )
+
+    val_upsampled = pd.concat([val_normal_upsampled, val_ddos])
+    X_val = val_upsampled.iloc[:, :-1]
+    y_val = val_upsampled.iloc[:, -1]
+
+    print("Counts after upsampling (validation):")
+    print(y_val.value_counts())
+
+    # ==== TEST DATA ====
     test_data = pd.read_csv(test_path, sep=',')
     X_test = test_data.iloc[:, :-1]
     y_test = test_data.iloc[:, -1]
@@ -322,7 +338,7 @@ def load_and_prepare_data(train_path, test_path, scaler_path):
     print("Counts in final validation set:")
     print(y_val.value_counts())
 
-    # Normalize the features
+    # ==== NORMALIZATION ====
     X_train, X_test, X_val = normalize_data(X_train, X_test, X_val, scaler_path)
 
     return X_train, X_test, y_train, y_test, X_val, y_val
