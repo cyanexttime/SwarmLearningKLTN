@@ -363,7 +363,7 @@ def train_and_evaluate(X_train, y_train, X_test, y_test, X_val, y_val, maxEpochs
     return results
 
 
-defaultMaxEpoch = 5
+defaultMaxEpoch = 10
 defaultMinPeers = 2
 
 trainFileName = 'h1_lite_true_proc_added.csv'
