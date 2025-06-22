@@ -100,8 +100,8 @@ def compile_train(model,X_train,y_train, X_val, y_val, maxEpochs, swarm_callback
             print("Loss key not found. Skipping loss plot.")
             print(model.metrics_names)
         
-        # Save plots
         if plot_save_path is not None:
+            os.makedirs(plot_save_path, exist_ok=True)  # Create directory if it doesn't exist
             plot_path = os.path.join(plot_save_path, 'training_plots.png')
             plt.savefig(plot_path)
             print(f'Training plots saved to {plot_path}')
