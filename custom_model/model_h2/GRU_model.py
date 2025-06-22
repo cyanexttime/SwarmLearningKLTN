@@ -48,13 +48,16 @@ def GRU_model(input_size):
     return model
 
 # compile and train learning model
-def compile_train(model,X_train,y_train, X_val, y_val, maxEpochs, swarm_callback=None, deep=True, plot_save_path=None):
+def compile_train(model, X_train, y_train, X_val, y_val, maxEpochs, swarm_callback=None, deep=True, plot_save_path=None):
     # Callbacks
     history_callback = History()
-    if(deep==True):
-        model.compile(loss='binary_crossentropy',
-                      optimizer='adam',
-                      metrics=['accuracy'])
+    
+    if deep:
+        model.compile(
+            loss='binary_crossentropy',
+            optimizer='adam',
+            metrics=['accuracy']
+        )
         
         callbacks = [history_callback]
         if swarm_callback is not None:
@@ -68,12 +71,15 @@ def compile_train(model,X_train,y_train, X_val, y_val, maxEpochs, swarm_callback
             verbose=1,
             callbacks=callbacks
         )
-            # Plotting training metrics
+
+        # Plotting training and validation metrics
         hist = history_callback.history
         print("History keys:", hist.keys())
 
-        acc_key = 'accuracy' if 'accuracy' in hist else 'acc'
+        acc_key = 'accuracy'
+        val_acc_key = 'val_accuracy'
         loss_key = 'loss'
+        val_loss_key = 'val_loss'
 
         plt.figure(figsize=(12, 5))
 
@@ -81,7 +87,9 @@ def compile_train(model,X_train,y_train, X_val, y_val, maxEpochs, swarm_callback
         if acc_key in hist:
             plt.subplot(1, 2, 1)
             plt.plot(hist[acc_key], label='Training Accuracy')
-            plt.title('Training Accuracy Over Epochs')
+            if val_acc_key in hist:
+                plt.plot(hist[val_acc_key], label='Validation Accuracy', linestyle='--')
+            plt.title('Accuracy Over Epochs')
             plt.xlabel('Epoch')
             plt.ylabel('Accuracy')
             plt.legend()
@@ -92,7 +100,9 @@ def compile_train(model,X_train,y_train, X_val, y_val, maxEpochs, swarm_callback
         if loss_key in hist:
             plt.subplot(1, 2, 2)
             plt.plot(hist[loss_key], label='Training Loss', color='orange')
-            plt.title('Training Loss Over Epochs')
+            if val_loss_key in hist:
+                plt.plot(hist[val_loss_key], label='Validation Loss', color='red', linestyle='--')
+            plt.title('Loss Over Epochs')
             plt.xlabel('Epoch')
             plt.ylabel('Loss')
             plt.legend()
@@ -101,14 +111,16 @@ def compile_train(model,X_train,y_train, X_val, y_val, maxEpochs, swarm_callback
             print(model.metrics_names)
         
         if plot_save_path is not None:
-            os.makedirs(plot_save_path, exist_ok=True)  # Create directory if it doesn't exist
+            os.makedirs(plot_save_path, exist_ok=True)
             plot_path = os.path.join(plot_save_path, 'training_plots.png')
             plt.savefig(plot_path)
             print(f'Training plots saved to {plot_path}')
-        
+        else:
+            plt.show()
+
     else:
-        model.fit(X_train, y_train) #SVM, LR, GD
-    
+        model.fit(X_train, y_train)  # For non-deep models (e.g., SVM)
+
     print('Model Compiled and Trained')
     return model
 
