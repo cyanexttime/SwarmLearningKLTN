@@ -4,6 +4,7 @@ import pickle
 import pandas as pd
 import numpy as np
 import tensorflow as tf
+
 import matplotlib
 matplotlib.use('Agg')
 
@@ -23,7 +24,9 @@ from sklearn.linear_model import LogisticRegression, SGDClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import StandardScaler,MinMaxScaler
 from swarmlearning.tf import SwarmCallback
-from keras.callbacks import History
+
+from tensorflow.keras.callbacks import History
+
 
 #input_size
 # -> CIC-DDoS2019 82
@@ -45,7 +48,7 @@ def GRU_model(input_size):
     return model
 
 # compile and train learning model
-def compile_train(model,X_train,y_train, X_val, y_val, maxEpochs, swarm_callback=None, deep=True, save_path=None):
+def compile_train(model,X_train,y_train, X_val, y_val, maxEpochs, swarm_callback=None, deep=True, plot_save_path=None):
     # Callbacks
     history_callback = History()
     if(deep==True):
@@ -98,8 +101,8 @@ def compile_train(model,X_train,y_train, X_val, y_val, maxEpochs, swarm_callback
             print(model.metrics_names)
         
         # Save plots
-        if save_path is not None:
-            plot_path = os.path.join(save_path, 'training_plots.png')
+        if plot_save_path is not None:
+            plot_path = os.path.join(plot_save_path, 'training_plots.png')
             plt.savefig(plot_path)
             print(f'Training plots saved to {plot_path}')
         
@@ -155,7 +158,7 @@ def testes(model, X_test, y_test, y_pred=None, deep=True, threshold=0.8):
     mae = mean_absolute_error(y_test, y_score)
     mse = mean_squared_error(y_test, y_score)
     rmse = np.sqrt(mse)
-    
+
     print(f"\n--- Regression-style Metrics on Probabilities ---")
     print(f"MAE:  {mae:.4f}")
     print(f"MSE:  {mse:.4f}")
@@ -170,6 +173,7 @@ def testes(model, X_test, y_test, y_pred=None, deep=True, threshold=0.8):
     plt.title("Confusion Matrix")
     plt.savefig("confusion_matrix.png")
     plt.close()
+
     # ROC Curve
     fpr, tpr, _ = roc_curve(y_test, y_score)
     roc_auc = auc(fpr, tpr)
@@ -208,8 +212,10 @@ def test_normal_atk(y_test,y_pred):
 
 
 def train_test(samples):
-    
-    
+    # # Separate features and labels
+    # X = samples.iloc[:, :-1]
+    # y = samples.iloc[:, -1]
+
     # Combine for easy manipulation
     data = samples.copy()
     
@@ -313,7 +319,7 @@ def load_and_prepare_data(train_path, test_path, scaler_path):
     return X_train, X_test, y_train, y_test, X_val, y_val
 
 
-def train_and_evaluate(X_train, y_train, X_test, y_test, X_val, y_val, maxEpochs, minPeers, save_path):
+def train_and_evaluate(X_train, y_train, X_test, y_test, X_val, y_val, maxEpochs, minPeers, save_path, plot_save_path=None):
     
     swarm_callback = SwarmCallback(
         syncFrequency=1024,  # Number of training samples after which peers sync their model weights
@@ -331,13 +337,12 @@ def train_and_evaluate(X_train, y_train, X_test, y_test, X_val, y_val, maxEpochs
     swarm_callback.logger.setLevel(logging.DEBUG)
 
     model = GRU_model(X_train.shape[1])
-    model = compile_train(model, format_3d(X_train), y_train, format_3d(X_val), y_val, maxEpochs, swarm_callback, deep=True, save_path=save_path)
+    model = compile_train(model, format_3d(X_train), y_train, format_3d(X_val), y_val, maxEpochs, swarm_callback, deep=True, plot_save_path=plot_save_path)
 
     y_pred = model.predict(format_3d(X_test)).round()
     norm, atk = test_normal_atk(y_test, y_pred)
     acc, prec, rec, f1, avrg, mae, mse, rmse = testes(model, format_3d(X_test), y_test, y_pred, True)
 
-    # Save the trained model
     model.save(save_path)
     print(f"Model saved to {save_path}")
 
@@ -373,6 +378,7 @@ def main():
 
     # Save the trained model
     save_path = os.path.join(scratchDir, 'gru_model.h5')
+    plot_save_path = os.path.join(scratchDir, 'plots')
 
     maxEpoch = int(os.getenv('MAX_EPOCHS', str(defaultMaxEpoch)))
     minPeers = int(os.getenv('MIN_PEERS', str(defaultMinPeers)))
@@ -388,14 +394,11 @@ def main():
     print("Data loaded and prepared.")
 
     print("Training and evaluating GRU model...")
-    results = train_and_evaluate(X_train, y_train, X_test, y_test, X_val, y_val, maxEpoch, minPeers, save_path)
+    results = train_and_evaluate(X_train, y_train, X_test, y_test, X_val, y_val, maxEpoch, minPeers, save_path, plot_save_path)
 
     results.to_csv('gru_ddos_results.csv', index=False)
     print("Results saved to 'gru_ddos_results.csv'")
     print(results)
-
-    
-
 
 if __name__ == '__main__':
     main()
