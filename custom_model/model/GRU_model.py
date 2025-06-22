@@ -338,14 +338,6 @@ def train_and_evaluate(X_train, y_train, X_test, y_test, X_val, y_val, maxEpochs
     model = GRU_model(X_train.shape[1])
     model = compile_train(model, format_3d(X_train), y_train, format_3d(X_val), y_val, maxEpochs, swarm_callback, deep=True, plot_save_path=plot_save_path)
 
-    # Now wait explicitly for final Swarm sync
-    print("Waiting for final Swarm Learning synchronization to complete...")
-
-    # This ensures we wait for the last global model update
-    with swarm_callback.model_update_condition:
-        swarm_callback.model_update_condition.wait(timeout=120)  # give enough time for merge
-
-    print("Final global model sync completed.")
 
     y_pred = model.predict(format_3d(X_test)).round()
     norm, atk = test_normal_atk(y_test, y_pred)
