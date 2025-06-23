@@ -97,8 +97,8 @@ def compile_train(model, X_train, y_train, X_val, y_val, maxEpochs, swarm_callba
             # Tick customization (manual)
             epochs = len(hist[acc_key])
             plt.xticks(np.arange(0, epochs + 1, step=1))  # x ticks every epoch
-            plt.yticks(np.arange(0.1, 1.01, step=0.1))   # y ticks from 0.1 to 1.0 with step 0.1
-            plt.ylim(0.1, 1.0)                            # y-axis limits between 0.1 and 1.0
+            plt.yticks(np.arange(0.6, 1.01, step=0.1))   # y ticks from 0.6 to 1.0 with step 0.1
+            plt.ylim(0.6, 1.0)                            # y-axis limits between 0.6 and 1.0
         else:
             print("Accuracy key not found. Skipping accuracy plot.")
 
@@ -118,7 +118,7 @@ def compile_train(model, X_train, y_train, X_val, y_val, maxEpochs, swarm_callba
             plt.xticks(np.arange(0, epochs + 1, step=1))   # x ticks every epoch
 
             max_loss = max(max(hist[loss_key]), max(hist.get(val_loss_key, [0])))
-            plt.yticks(np.arange(0.0, max_loss + 0.1, step=0.1))  # y ticks based on max loss
+            plt.yticks(np.arange(0.0, max_loss + 0.1, step=0.05))  # y ticks based on max loss
         else:
             print("Loss key not found. Skipping loss plot.")
             print(model.metrics_names)
