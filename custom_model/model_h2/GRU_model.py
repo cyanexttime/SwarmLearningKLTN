@@ -97,7 +97,8 @@ def compile_train(model, X_train, y_train, X_val, y_val, maxEpochs, swarm_callba
             # Tick customization (manual)
             epochs = len(hist[acc_key])
             plt.xticks(np.arange(0, epochs + 1, step=1))  # x ticks every epoch
-            plt.yticks(np.arange(0.0, 1.1, step=0.1))     # y ticks from 0.0 to 1.0 with step 0.1
+            plt.yticks(np.arange(0.9, 1.01, step=0.05))   # y ticks from 0.9 to 1.0 with step 0.05
+            plt.ylim(0.9, 1.0)                            # y-axis limits between 0.9 and 1.0
         else:
             print("Accuracy key not found. Skipping accuracy plot.")
 
