@@ -67,7 +67,6 @@ def compile_train(model, X_train, y_train, X_val, y_val, maxEpochs, swarm_callba
             X_train, y_train,
             validation_data=(X_val, y_val) if X_val is not None and y_val is not None else None,
             epochs=maxEpochs,
-            batch_size=256,
             verbose=1,
             callbacks=callbacks
         )
@@ -93,6 +92,11 @@ def compile_train(model, X_train, y_train, X_val, y_val, maxEpochs, swarm_callba
             plt.xlabel('Epoch')
             plt.ylabel('Accuracy')
             plt.legend()
+
+            # Tick customization (manual)
+            epochs = len(hist[acc_key])
+            plt.xticks(np.arange(0, epochs + 1, step=1))  # x ticks every epoch
+            plt.yticks(np.arange(0.0, 1.1, step=0.1))     # y ticks from 0.0 to 1.0 with step 0.1
         else:
             print("Accuracy key not found. Skipping accuracy plot.")
 
@@ -106,6 +110,13 @@ def compile_train(model, X_train, y_train, X_val, y_val, maxEpochs, swarm_callba
             plt.xlabel('Epoch')
             plt.ylabel('Loss')
             plt.legend()
+
+            # Tick customization (manual)
+            epochs = len(hist[loss_key])
+            plt.xticks(np.arange(0, epochs + 1, step=1))   # x ticks every epoch
+
+            max_loss = max(max(hist[loss_key]), max(hist.get(val_loss_key, [0])))
+            plt.yticks(np.arange(0.0, max_loss + 0.1, step=0.1))  # y ticks based on max loss
         else:
             print("Loss key not found. Skipping loss plot.")
             print(model.metrics_names)
@@ -123,6 +134,7 @@ def compile_train(model, X_train, y_train, X_val, y_val, maxEpochs, swarm_callba
 
     print('Model Compiled and Trained')
     return model
+
 
 def testes(model, X_test, y_test, y_pred=None, deep=True, threshold=0.8):
     # Evaluate deep learning model if applicable
