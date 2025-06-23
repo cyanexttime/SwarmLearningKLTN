@@ -67,6 +67,7 @@ def compile_train(model, X_train, y_train, X_val, y_val, maxEpochs, swarm_callba
             X_train, y_train,
             validation_data=(X_val, y_val) if X_val is not None and y_val is not None else None,
             epochs=maxEpochs,
+            batch_size=512,
             verbose=1,
             callbacks=callbacks
         )
@@ -359,11 +360,11 @@ def load_and_prepare_data(train_path, test_path, scaler_path):
 def train_and_evaluate(X_train, y_train, X_test, y_test, X_val, y_val, maxEpochs, minPeers, save_path, plot_save_path=None):
     
     swarm_callback = SwarmCallback(
-        syncFrequency=1024,  # Number of training samples after which peers sync their model weights
+        syncFrequency=4048,  # Number of training samples after which peers sync their model weights
         minPeers=minPeers,  # Minimum number of active peers required to perform synchronization
         useAdaptiveSync=False,  # Disable adaptive sync; use fixed sync frequency instead
         adsValData=(format_3d(X_val), y_val),  # Validation data for Adaptive Sync and model merging decision
-        adsValBatchSize=512,  # Batch size used during validation at sync points
+        adsValBatchSize=512,  # Batch size for validation data during Adaptive Sync
         mergeMethod='mean',  # Aggregation method to merge model weights from different peers
         node_weightage=1,  # Equal weightage given to this node's model when averaging
         logDir=os.path.join(
