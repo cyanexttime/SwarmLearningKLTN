@@ -363,7 +363,7 @@ def train_and_evaluate(X_train, y_train, X_test, y_test, X_val, y_val, maxEpochs
         minPeers=minPeers,  # Minimum number of active peers required to perform synchronization
         useAdaptiveSync=False,  # Disable adaptive sync; use fixed sync frequency instead
         adsValData=(format_3d(X_val), y_val),  # Validation data for Adaptive Sync and model merging decision
-        adsValBatchSize=256,  # Batch size used during validation at sync points
+        adsValBatchSize=512,  # Batch size used during validation at sync points
         mergeMethod='mean',  # Aggregation method to merge model weights from different peers
         node_weightage=1,  # Equal weightage given to this node's model when averaging
         logDir=os.path.join(
