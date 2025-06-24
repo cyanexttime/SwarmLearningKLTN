@@ -423,7 +423,7 @@ def load_and_prepare_data(train_path, test_path, scaler_path):
 def train_and_evaluate(X_train, y_train, X_test, y_test, X_val, y_val, maxEpochs, minPeers, save_path, plot_save_path=None):
     
     swarm_callback = SwarmCallback(
-        syncFrequency=1024,  # Number of training samples after which peers sync their model weights
+        syncFrequency=1255,  # Number of training samples after which peers sync their model weights
         minPeers=minPeers,  # Minimum number of active peers required to perform synchronization
         useAdaptiveSync=False,  # Disable adaptive sync; use fixed sync frequency instead
         adsValData=(format_3d(X_val), y_val),  # Validation data for Adaptive Sync and model merging decision
