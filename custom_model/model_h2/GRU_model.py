@@ -301,42 +301,11 @@ def load_and_prepare_data(train_path, test_path, scaler_path):
     samples = pd.read_csv(train_path, sep=',')
     X_train, X_val, y_train, y_val = train_test(samples)
 
-    # ==== UPSAMPLE TRAINING DATA ====
-    X = pd.concat([X_train, y_train], axis=1)
-    normal = X[X[' Label'] == 0]
-    ddos = X[X[' Label'] != 0]
-
-    normal_upsampled = resample(
-        normal,
-        replace=True,
-        n_samples=len(ddos),
-        random_state=27
-    )
-
-    upsampled = pd.concat([normal_upsampled, ddos])
-    X_train = upsampled.iloc[:, :-1]
-    y_train = upsampled.iloc[:, -1]
-
-    print("Counts after upsampling (train):")
+    # ==== NO UPSAMPLING ====
+    print("Counts in training set:")
     print(y_train.value_counts())
 
-    # ==== UPSAMPLE VALIDATION DATA ====
-    val = pd.concat([X_val, y_val], axis=1)
-    val_normal = val[val[' Label'] == 0]
-    val_ddos = val[val[' Label'] != 0]
-
-    val_normal_upsampled = resample(
-        val_normal,
-        replace=True,
-        n_samples=len(val_ddos),
-        random_state=27
-    )
-
-    val_upsampled = pd.concat([val_normal_upsampled, val_ddos])
-    X_val = val_upsampled.iloc[:, :-1]
-    y_val = val_upsampled.iloc[:, -1]
-
-    print("Counts after upsampling (validation):")
+    print("Counts in validation set:")
     print(y_val.value_counts())
 
     # ==== TEST DATA ====
