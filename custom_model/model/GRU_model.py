@@ -26,11 +26,25 @@ from sklearn.preprocessing import StandardScaler,MinMaxScaler
 from swarmlearning.tf import SwarmCallback
 
 from tensorflow.keras.callbacks import History
-
+from tensorflow.keras.callbacks import Callback
 
 #input_size
 # -> CIC-DDoS2019 82
 # -> CIC-IDS2018 78
+
+class SyncLossLogger(Callback):
+    def __init__(self, sync_freq):
+        super().__init__()
+        self.sync_freq = sync_freq
+        self.sync_losses = []
+        self.sync_batches = []
+        self.batch_count = 0
+
+    def on_train_batch_end(self, batch, logs=None):
+        self.batch_count += 1
+        if self.batch_count % self.sync_freq == 0:
+            self.sync_losses.append(logs.get('loss'))
+            self.sync_batches.append(self.batch_count)
 
 def GRU_model(input_size):
    
@@ -51,7 +65,7 @@ def GRU_model(input_size):
 def compile_train(model, X_train, y_train, X_val, y_val, maxEpochs, swarm_callback=None, deep=True, plot_save_path=None):
     # Callbacks
     history_callback = History()
-    
+    sync_logger = SyncLossLogger(sync_freq=1024)
     if deep:
         model.compile(
             loss='binary_crossentropy',
@@ -130,6 +144,20 @@ def compile_train(model, X_train, y_train, X_val, y_val, maxEpochs, swarm_callba
             print(f'Training plots saved to {plot_path}')
         else:
             plt.show()
+
+        # === NEW: Plot sync loss ===
+        if len(sync_logger.sync_losses) > 0:
+            plt.figure(figsize=(6, 4))
+            plt.plot(sync_logger.sync_batches, sync_logger.sync_losses, marker='o', linestyle='-', color='blue', label='Local Loss at Sync')
+            plt.title('Local Loss at Each Swarm Sync Point')
+            plt.xlabel('Batch Number')
+            plt.ylabel('Loss')
+            plt.grid(True)
+            plt.legend()
+            sync_loss_path = os.path.join(plot_save_path, 'sync_loss_plot.png') if plot_save_path else 'sync_loss_plot.png'
+            plt.savefig(sync_loss_path)
+            print(f'Sync loss plot saved to {sync_loss_path}')
+            plt.close()
 
     else:
         model.fit(X_train, y_train)  # For non-deep models (e.g., SVM)
