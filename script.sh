@@ -177,91 +177,91 @@ case "$1" in
         ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning/workspace/mnist && rm -r model"
         ssh ${REMOTE_USER}@${REMOTE_IP2} "cd SwarmLearningKLTN/mnist_2hosts && cp -r model swop swci /opt/hpe/swarm-learning/workspace/mnist/"
         ;;
-    # scenario3)
-    #     # Scenario 3
-    #     ssh ${REMOTE_USER}@${REMOTE_IP1} "cd /opt/hpe/swarm-learning/workspace/mnist && rm -r model"
-    #     ssh ${REMOTE_USER}@${REMOTE_IP1} "cd SwarmLearningKLTN/mnist_3host && cp -r model swop swci /opt/hpe/swarm-learning/workspace/mnist/"
+    scenario3)
+        # Scenario 3
+        ssh ${REMOTE_USER}@${REMOTE_IP1} "cd /opt/hpe/swarm-learning/workspace/mnist && rm -r model"
+        ssh ${REMOTE_USER}@${REMOTE_IP1} "cd SwarmLearningKLTN/mnist_3host && cp -r model swop swci /opt/hpe/swarm-learning/workspace/mnist/"
 
-    #     ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning/workspace/mnist && rm -r model"
-    #     ssh ${REMOTE_USER}@${REMOTE_IP2} "cd SwarmLearningKLTN/mnist_3host && cp -r model swop swci /opt/hpe/swarm-learning/workspace/mnist/"
-    #     ;;
-    # 4)
-    #     # Scenario 4
-    #     ssh ${REMOTE_USER}@${REMOTE_IP1} "cd /opt/hpe/swarm-learning/workspace/mnist && rm -r model"
-    #     ssh ${REMOTE_USER}@${REMOTE_IP1} "cd SwarmLearningKLTN/mnist_custom && cp -r model swop swci /opt/hpe/swarm-learning/workspace/mnist/"
+        ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning/workspace/mnist && rm -r model"
+        ssh ${REMOTE_USER}@${REMOTE_IP2} "cd SwarmLearningKLTN/mnist_3host && cp -r model swop swci /opt/hpe/swarm-learning/workspace/mnist/"
+        ;;
+    4)
+        # Scenario 4
+        ssh ${REMOTE_USER}@${REMOTE_IP1} "cd /opt/hpe/swarm-learning/workspace/mnist && rm -r model"
+        ssh ${REMOTE_USER}@${REMOTE_IP1} "cd SwarmLearningKLTN/mnist_custom && cp -r model swop swci /opt/hpe/swarm-learning/workspace/mnist/"
 
-    #     ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning/workspace/mnist && rm -r model"
-    #     ssh ${REMOTE_USER}@${REMOTE_IP2} "cd SwarmLearningKLTN/mnist_custom && cp -r model swop swci /opt/hpe/swarm-learning/workspace/mnist/"
-    #     ;;
-    # 5)
-    #     # Scenario 5
-    #     ssh ${REMOTE_USER}@${REMOTE_IP1} "cd /opt/hpe/swarm-learning/workspace/mnist && rm -r model"
-    #     ssh ${REMOTE_USER}@${REMOTE_IP1} "cd SwarmLearningKLTN/mnist_lucid && cp -r model swop swci data-and-edge1 /opt/hpe/swarm-learning/workspace/mnist/"
+        ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning/workspace/mnist && rm -r model"
+        ssh ${REMOTE_USER}@${REMOTE_IP2} "cd SwarmLearningKLTN/mnist_custom && cp -r model swop swci /opt/hpe/swarm-learning/workspace/mnist/"
+        ;;
+    5)
+        # Scenario 5
+        ssh ${REMOTE_USER}@${REMOTE_IP1} "cd /opt/hpe/swarm-learning/workspace/mnist && rm -r model"
+        ssh ${REMOTE_USER}@${REMOTE_IP1} "cd SwarmLearningKLTN/mnist_lucid && cp -r model swop swci data-and-edge1 /opt/hpe/swarm-learning/workspace/mnist/"
 
-    #     ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning/workspace/mnist && rm -r model"
-    #     ssh ${REMOTE_USER}@${REMOTE_IP2} "cd SwarmLearningKLTN/mnist_lucid && cp -r model swop swci data-and-edge2 /opt/hpe/swarm-learning/workspace/mnist/"
-    #     ;;
-    # 6)
-    #     # Scenario 6
-    #     ssh ${REMOTE_USER}@${REMOTE_IP1} "cd /opt/hpe/swarm-learning/workspace/mnist && rm -r model"
-    #     ssh ${REMOTE_USER}@${REMOTE_IP1} "cd SwarmLearningKLTN/mnist_lucid && cp -r model swop swci dataset /opt/hpe/swarm-learning/workspace/mnist/"
+        ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning/workspace/mnist && rm -r model"
+        ssh ${REMOTE_USER}@${REMOTE_IP2} "cd SwarmLearningKLTN/mnist_lucid && cp -r model swop swci data-and-edge2 /opt/hpe/swarm-learning/workspace/mnist/"
+        ;;
+    6)
+        # Scenario 6
+        ssh ${REMOTE_USER}@${REMOTE_IP1} "cd /opt/hpe/swarm-learning/workspace/mnist && rm -r model"
+        ssh ${REMOTE_USER}@${REMOTE_IP1} "cd SwarmLearningKLTN/mnist_lucid && cp -r model swop swci dataset /opt/hpe/swarm-learning/workspace/mnist/"
 
-    #     ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning/workspace/mnist && rm -r model"
-    #     ssh ${REMOTE_USER}@${REMOTE_IP2} "cd SwarmLearningKLTN/mnist_lucid && cp -r model swop swci dataset /opt/hpe/swarm-learning/workspace/mnist/"
-    #     ;;
-    # 7)
-    #     # Scenario 7
-    #     ssh ${REMOTE_USER}@${REMOTE_IP1} "cd /opt/hpe/swarm-learning/workspace/mnist && rm -r model"
-    #     ssh ${REMOTE_USER}@${REMOTE_IP1} "cd SwarmLearningKLTN/mnist_multimodal_2hosts && cp -r model swop swci dataset /opt/hpe/swarm-learning/workspace/mnist/"
+        ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning/workspace/mnist && rm -r model"
+        ssh ${REMOTE_USER}@${REMOTE_IP2} "cd SwarmLearningKLTN/mnist_lucid && cp -r model swop swci dataset /opt/hpe/swarm-learning/workspace/mnist/"
+        ;;
+    7)
+        # Scenario 7
+        ssh ${REMOTE_USER}@${REMOTE_IP1} "cd /opt/hpe/swarm-learning/workspace/mnist && rm -r model"
+        ssh ${REMOTE_USER}@${REMOTE_IP1} "cd SwarmLearningKLTN/mnist_multimodal_2hosts && cp -r model swop swci dataset /opt/hpe/swarm-learning/workspace/mnist/"
 
-    #     ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning/workspace/mnist && rm -r model"
-    #     ssh ${REMOTE_USER}@${REMOTE_IP2} "cd SwarmLearningKLTN/mnist_multimodal_2hosts && cp -r model swop swci dataset /opt/hpe/swarm-learning/workspace/mnist/"
-    #     ;;
-    # 8)
-    #     # Scenario 8
-    #     ssh ${REMOTE_USER}@${REMOTE_IP1} "cd /opt/hpe/swarm-learning/workspace/mnist && rm -r model"
-    #     ssh ${REMOTE_USER}@${REMOTE_IP1} "cd SwarmLearningKLTN/edge_multimodal_2hosts && cp -r model swop swci /opt/hpe/swarm-learning/workspace/mnist/"
-    #     ssh ${REMOTE_USER}@${REMOTE_IP1} "cd /opt/hpe/swarm-learning/ && cp -r dataset /opt/hpe/swarm-learning/workspace/mnist/"
+        ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning/workspace/mnist && rm -r model"
+        ssh ${REMOTE_USER}@${REMOTE_IP2} "cd SwarmLearningKLTN/mnist_multimodal_2hosts && cp -r model swop swci dataset /opt/hpe/swarm-learning/workspace/mnist/"
+        ;;
+    8)
+        # Scenario 8
+        ssh ${REMOTE_USER}@${REMOTE_IP1} "cd /opt/hpe/swarm-learning/workspace/mnist && rm -r model"
+        ssh ${REMOTE_USER}@${REMOTE_IP1} "cd SwarmLearningKLTN/edge_multimodal_2hosts && cp -r model swop swci /opt/hpe/swarm-learning/workspace/mnist/"
+        ssh ${REMOTE_USER}@${REMOTE_IP1} "cd /opt/hpe/swarm-learning/ && cp -r dataset /opt/hpe/swarm-learning/workspace/mnist/"
 
-    #     ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning/workspace/mnist && rm -r model"
-    #     ssh ${REMOTE_USER}@${REMOTE_IP2} "cd SwarmLearningKLTN/edge_multimodal_2hosts && cp -r model swop swci /opt/hpe/swarm-learning/workspace/mnist/"
-    #     ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning/ && cp -r dataset /opt/hpe/swarm-learning/workspace/mnist/"
-    #     ;;    
-    # 9)
-    #     # Scenario 9
-    #     ssh ${REMOTE_USER}@${REMOTE_IP1} "cd /opt/hpe/swarm-learning/workspace/mnist && rm -r model"
-    #     ssh ${REMOTE_USER}@${REMOTE_IP1} "cd SwarmLearningKLTN/edge_multimodal_3hosts && cp -r model swop swci /opt/hpe/swarm-learning/workspace/mnist/"
-    #     ssh ${REMOTE_USER}@${REMOTE_IP1} "cd /opt/hpe/swarm-learning/ && cp -r dataset /opt/hpe/swarm-learning/workspace/mnist/"
+        ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning/workspace/mnist && rm -r model"
+        ssh ${REMOTE_USER}@${REMOTE_IP2} "cd SwarmLearningKLTN/edge_multimodal_2hosts && cp -r model swop swci /opt/hpe/swarm-learning/workspace/mnist/"
+        ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning/ && cp -r dataset /opt/hpe/swarm-learning/workspace/mnist/"
+        ;;    
+    9)
+        # Scenario 9
+        ssh ${REMOTE_USER}@${REMOTE_IP1} "cd /opt/hpe/swarm-learning/workspace/mnist && rm -r model"
+        ssh ${REMOTE_USER}@${REMOTE_IP1} "cd SwarmLearningKLTN/edge_multimodal_3hosts && cp -r model swop swci /opt/hpe/swarm-learning/workspace/mnist/"
+        ssh ${REMOTE_USER}@${REMOTE_IP1} "cd /opt/hpe/swarm-learning/ && cp -r dataset /opt/hpe/swarm-learning/workspace/mnist/"
 
-    #     ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning/workspace/mnist && rm -r model"
-    #     ssh ${REMOTE_USER}@${REMOTE_IP2} "cd SwarmLearningKLTN/edge_multimodal_3hosts && cp -r model swop swci /opt/hpe/swarm-learning/workspace/mnist/"
-    #     ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning/ && cp -r dataset /opt/hpe/swarm-learning/workspace/mnist/"
+        ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning/workspace/mnist && rm -r model"
+        ssh ${REMOTE_USER}@${REMOTE_IP2} "cd SwarmLearningKLTN/edge_multimodal_3hosts && cp -r model swop swci /opt/hpe/swarm-learning/workspace/mnist/"
+        ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning/ && cp -r dataset /opt/hpe/swarm-learning/workspace/mnist/"
         
-    #     ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning/workspace/mnist && rm -r model"
-    #     ssh ${REMOTE_USER}@${REMOTE_IP3} "cd SwarmLearningKLTN/edge_multimodal_3hosts && cp -r model swop swci /opt/hpe/swarm-learning/workspace/mnist/"
-    #     ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning/ && cp -r dataset /opt/hpe/swarm-learning/workspace/mnist/"
-    #     ;;
-    # 10)
-    #     # Scenario 10
-    #     ssh ${REMOTE_USER}@${REMOTE_IP1} "cd /opt/hpe/swarm-learning/workspace/mnist && rm -r model"
-    #     ssh ${REMOTE_USER}@${REMOTE_IP1} "cd SwarmLearningKLTN/kltn_multimodal_5hosts && cp -r model swop swci /opt/hpe/swarm-learning/workspace/mnist/"
-    #     ssh ${REMOTE_USER}@${REMOTE_IP1} "cd /opt/hpe/swarm-learning/ && cp -r dataset /opt/hpe/swarm-learning/workspace/mnist/"
+        ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning/workspace/mnist && rm -r model"
+        ssh ${REMOTE_USER}@${REMOTE_IP3} "cd SwarmLearningKLTN/edge_multimodal_3hosts && cp -r model swop swci /opt/hpe/swarm-learning/workspace/mnist/"
+        ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning/ && cp -r dataset /opt/hpe/swarm-learning/workspace/mnist/"
+        ;;
+    10)
+        # Scenario 10
+        ssh ${REMOTE_USER}@${REMOTE_IP1} "cd /opt/hpe/swarm-learning/workspace/mnist && rm -r model"
+        ssh ${REMOTE_USER}@${REMOTE_IP1} "cd SwarmLearningKLTN/kltn_multimodal_5hosts && cp -r model swop swci /opt/hpe/swarm-learning/workspace/mnist/"
+        ssh ${REMOTE_USER}@${REMOTE_IP1} "cd /opt/hpe/swarm-learning/ && cp -r dataset /opt/hpe/swarm-learning/workspace/mnist/"
 
-    #     ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning/workspace/mnist && rm -r model"
-    #     ssh ${REMOTE_USER}@${REMOTE_IP2} "cd SwarmLearningKLTN/kltn_multimodal_5hosts && cp -r model swop swci /opt/hpe/swarm-learning/workspace/mnist/"
-    #     ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning/ && cp -r dataset /opt/hpe/swarm-learning/workspace/mnist/"
+        ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning/workspace/mnist && rm -r model"
+        ssh ${REMOTE_USER}@${REMOTE_IP2} "cd SwarmLearningKLTN/kltn_multimodal_5hosts && cp -r model swop swci /opt/hpe/swarm-learning/workspace/mnist/"
+        ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning/ && cp -r dataset /opt/hpe/swarm-learning/workspace/mnist/"
         
-    #     ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning/workspace/mnist && rm -r model"
-    #     ssh ${REMOTE_USER}@${REMOTE_IP3} "cd SwarmLearningKLTN/kltn_multimodal_5hosts && cp -r model swop swci /opt/hpe/swarm-learning/workspace/mnist/"
-    #     ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning/ && cp -r dataset /opt/hpe/swarm-learning/workspace/mnist/"
+        ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning/workspace/mnist && rm -r model"
+        ssh ${REMOTE_USER}@${REMOTE_IP3} "cd SwarmLearningKLTN/kltn_multimodal_5hosts && cp -r model swop swci /opt/hpe/swarm-learning/workspace/mnist/"
+        ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning/ && cp -r dataset /opt/hpe/swarm-learning/workspace/mnist/"
 
-    #     ssh ${REMOTE_USER}@${REMOTE_IP4} "cd /opt/hpe/swarm-learning/workspace/mnist && rm -r model"
-    #     ssh ${REMOTE_USER}@${REMOTE_IP4} "cd SwarmLearningKLTN/kltn_multimodal_5hosts && cp -r model swop swci /opt/hpe/swarm-learning/workspace/mnist/"
-    #     ssh ${REMOTE_USER}@${REMOTE_IP4} "cd /opt/hpe/swarm-learning/ && cp -r dataset /opt/hpe/swarm-learning/workspace/mnist/"
+        ssh ${REMOTE_USER}@${REMOTE_IP4} "cd /opt/hpe/swarm-learning/workspace/mnist && rm -r model"
+        ssh ${REMOTE_USER}@${REMOTE_IP4} "cd SwarmLearningKLTN/kltn_multimodal_5hosts && cp -r model swop swci /opt/hpe/swarm-learning/workspace/mnist/"
+        ssh ${REMOTE_USER}@${REMOTE_IP4} "cd /opt/hpe/swarm-learning/ && cp -r dataset /opt/hpe/swarm-learning/workspace/mnist/"
 
-    #     ssh ${REMOTE_USER}@${REMOTE_IP5} "cd /opt/hpe/swarm-learning/workspace/mnist && rm -r model"
-    #     ssh ${REMOTE_USER}@${REMOTE_IP5} "cd SwarmLearningKLTN/kltn_multimodal_5hosts && cp -r model swop swci /opt/hpe/swarm-learning/workspace/mnist/"
-    #     ssh ${REMOTE_USER}@${REMOTE_IP5} "cd /opt/hpe/swarm-learning/ && cp -r dataset /opt/hpe/swarm-learning/workspace/mnist/"
+        ssh ${REMOTE_USER}@${REMOTE_IP5} "cd /opt/hpe/swarm-learning/workspace/mnist && rm -r model"
+        ssh ${REMOTE_USER}@${REMOTE_IP5} "cd SwarmLearningKLTN/kltn_multimodal_5hosts && cp -r model swop swci /opt/hpe/swarm-learning/workspace/mnist/"
+        ssh ${REMOTE_USER}@${REMOTE_IP5} "cd /opt/hpe/swarm-learning/ && cp -r dataset /opt/hpe/swarm-learning/workspace/mnist/"
         ;; 
     *)
         echo "Invalid scenario. Use -h for help."
