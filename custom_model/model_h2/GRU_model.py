@@ -25,7 +25,6 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import StandardScaler,MinMaxScaler
 from swarmlearning.tf import SwarmCallback
 
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from tensorflow.keras.callbacks import History
 from tensorflow.keras.callbacks import Callback
 
@@ -83,7 +82,6 @@ def reshape_to_sequence(X, y, sequence_length=10):
         X_seq.append(X[i:i + sequence_length])
         y_seq.append(y[i + sequence_length - 1])
     return np.array(X_seq), np.array(y_seq)
-
 
 # compile and train learning model
 def compile_train(model, X_train, y_train, X_val, y_val, maxEpochs, swarm_callback=None, deep=True, plot_save_path=None):
@@ -441,7 +439,52 @@ def load_and_prepare_data(train_path, test_path, scaler_path):
 
 
 
+# def train_and_evaluate(X_train, y_train, X_test, y_test, X_val, y_val, maxEpochs, minPeers, save_path, plot_save_path=None):
+    
+#     swarm_callback = SwarmCallback(
+#         syncFrequency=1255,  # Number of training samples after which peers sync their model weights
+#         minPeers=minPeers,  # Minimum number of active peers required to perform synchronization
+#         useAdaptiveSync=False,  # Disable adaptive sync; use fixed sync frequency instead
+#         adsValData=(format_3d(X_val), y_val),  # Validation data for Adaptive Sync and model merging decision
+#         adsValBatchSize=512,  # Batch size for validation data during Adaptive Sync
+#         mergeMethod='coordmedian',  # Aggregation method to merge model weights from different peers
+#         node_weightage=1,  # Equal weightage given to this node's model when averaging
+#         logDir=os.path.join(
+#         os.getenv('SCRATCH_DIR', '/platform/scratch'),'swarm_logs')  # Directory path to store Swarm logs
+#     )
+
+#     # Set logging level for better visibility
+#     swarm_callback.logger.setLevel(logging.DEBUG)
+
+#     model = GRU_model(X_train.shape[1])
+#     model = compile_train(model, format_3d(X_train), y_train, format_3d(X_val), y_val, maxEpochs, swarm_callback, deep=True, plot_save_path=plot_save_path)
+
+
+#     y_pred = model.predict(format_3d(X_test)).round()
+#     norm, atk = test_normal_atk(y_test, y_pred)
+#     acc, prec, rec, f1 = testes(model, format_3d(X_test), y_test, y_pred, True)
+
+#     model.save(save_path)
+#     print(f"Model saved to {save_path}")
+
+#     # Store results in a DataFrame
+#     results = pd.DataFrame([{
+#         'Method': 'GRU',
+#         'Accuracy': acc,
+#         'Precision': prec,
+#         'Recall': rec,
+#         'F1_Score': f1,
+#         'Normal_Detect_Rate': norm,
+#         'Atk_Detect_Rate': atk,
+#     }])  
+#     return results
+
 def train_and_evaluate(X_train, y_train, X_test, y_test, X_val, y_val, maxEpochs, minPeers, save_path, plot_save_path=None):
+    from swarmlearning.tf import SwarmCallback
+    import os
+    import logging
+    import pandas as pd
+
     swarm_callback = SwarmCallback(
         syncFrequency=1255,
         minPeers=minPeers,
@@ -462,14 +505,8 @@ def train_and_evaluate(X_train, y_train, X_test, y_test, X_val, y_val, maxEpochs
     # Build and train model
     input_shape = (X_train_seq.shape[1], X_train_seq.shape[2])
     model = GRU_model(input_shape)
-    model.fit(
-        X_train_seq, y_train_seq,
-        validation_data=(X_val_seq, y_val_seq),
-        epochs=maxEpochs,
-        batch_size=256,
-        verbose=1,
-        callbacks=[swarm_callback]
-    )
+    model = compile_train(model, X_train_seq, y_train_seq, X_val_seq, y_val_seq, maxEpochs, swarm_callback, deep=True, plot_save_path=plot_save_path)
+
 
     # Evaluate model
     y_pred = model.predict(X_test_seq).round()
@@ -492,7 +529,6 @@ def train_and_evaluate(X_train, y_train, X_test, y_test, X_val, y_val, maxEpochs
         'F1_Score': f1
     }])
     return results
-
 
 
 defaultMaxEpoch = 10
