@@ -51,20 +51,20 @@ ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning && docker volume rm
 ssh ${REMOTE_USER}@${REMOTE_IP2} "rm -rf SwarmLearningKLTN"
 ssh ${REMOTE_USER}@${REMOTE_IP2} "docker ps -a"
 
-# ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning && docker rm -v -f $(docker ps -qa)"
-# ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning && docker container prune -f"
-# ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning && mv workspace/mnist/data-and-scratch{1,2,3} ."
-# ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning && mv workspace/mnist/data-and-edge{1,2,3} ."
-# ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning && rm -rf logs/ workspace host{1,2,3,4,5}"
-# ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning && docker rm -f sn{1,2,3} swop{1,2,3} swci1"
-# ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning && docker rm -f $(docker ps -a | grep 'user-env\|/sl:2' | awk '{print $1}')"
-# ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning && docker network rm host-{1,2,3}-net"
-# ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning && docker rm helper"
-# ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning && docker volume rm sl-cli-lib"
-# ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning && docker image rm tensorflow/tensorflow:2.7.1 user-env-tf2.7.0-swop:latest hello-world:latest"
-# ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning && docker volume rm $(docker volume ls -q | grep swop)"
-# ssh ${REMOTE_USER}@${REMOTE_IP3} "rm -rf SwarmLearningKLTN"
-# ssh ${REMOTE_USER}@${REMOTE_IP3} "docker ps -a"
+ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning && docker rm -v -f $(docker ps -qa)"
+ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning && docker container prune -f"
+ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning && mv workspace/mnist/data-and-scratch{1,2,3} ."
+ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning && mv workspace/mnist/data-and-edge{1,2,3} ."
+ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning && rm -rf logs/ workspace host{1,2,3,4,5}"
+ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning && docker rm -f sn{1,2,3} swop{1,2,3} swci1"
+ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning && docker rm -f $(docker ps -a | grep 'user-env\|/sl:2' | awk '{print $1}')"
+ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning && docker network rm host-{1,2,3}-net"
+ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning && docker rm helper"
+ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning && docker volume rm sl-cli-lib"
+ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning && docker image rm tensorflow/tensorflow:2.7.1 user-env-tf2.7.0-swop:latest hello-world:latest"
+ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning && docker volume rm $(docker volume ls -q | grep swop)"
+ssh ${REMOTE_USER}@${REMOTE_IP3} "rm -rf SwarmLearningKLTN"
+ssh ${REMOTE_USER}@${REMOTE_IP3} "docker ps -a"
 
 # # ssh ${REMOTE_USER}@${REMOTE_IP4} "cd /opt/hpe/swarm-learning && docker rm -v -f $(docker ps -qa)"
 # # ssh ${REMOTE_USER}@${REMOTE_IP4} "cd /opt/hpe/swarm-learning && docker container prune -f"
@@ -102,8 +102,8 @@ ssh ${REMOTE_USER}@${REMOTE_IP1} "cd /opt/hpe/swarm-learning && ./workspace/mnis
 ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning && mkdir workspace && cp -r examples/mnist workspace/ && cp -r examples/utils/gen-cert workspace/mnist/ && chmod 777 -R workspace/"
 ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning && ./workspace/mnist/gen-cert -e mnist -i 2"
 
-# ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning && mkdir workspace && cp -r examples/mnist workspace/ && cp -r examples/utils/gen-cert workspace/mnist/ && chmod 777 -R workspace/"
-# ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning && ./workspace/mnist/gen-cert -e mnist -i 3"
+ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning && mkdir workspace && cp -r examples/mnist workspace/ && cp -r examples/utils/gen-cert workspace/mnist/ && chmod 777 -R workspace/"
+ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning && ./workspace/mnist/gen-cert -e mnist -i 3"
 
 # ssh ${REMOTE_USER}@${REMOTE_IP4} "cd /opt/hpe/swarm-learning && mkdir workspace && cp -r examples/mnist workspace/ && cp -r examples/utils/gen-cert workspace/mnist/ && chmod 777 -R workspace/"
 # ssh ${REMOTE_USER}@${REMOTE_IP4} "cd /opt/hpe/swarm-learning && ./workspace/mnist/gen-cert -e mnist -i 4"
@@ -127,22 +127,22 @@ SN_P2P_PORT="30303"
 
 # Host 1:
 ssh ${REMOTE_USER}@${REMOTE_IP1} "cd /opt/hpe/swarm-learning && scp $HOST_2_IP:/opt/hpe/swarm-learning/workspace/mnist/cert/ca/capath/ca-2-cert.pem /opt/hpe/swarm-learning/workspace/mnist/cert/ca/capath"
-# ssh ${REMOTE_USER}@${REMOTE_IP1} "cd /opt/hpe/swarm-learning && scp $HOST_3_IP:/opt/hpe/swarm-learning/workspace/mnist/cert/ca/capath/ca-3-cert.pem /opt/hpe/swarm-learning/workspace/mnist/cert/ca/capath"
+ssh ${REMOTE_USER}@${REMOTE_IP1} "cd /opt/hpe/swarm-learning && scp $HOST_3_IP:/opt/hpe/swarm-learning/workspace/mnist/cert/ca/capath/ca-3-cert.pem /opt/hpe/swarm-learning/workspace/mnist/cert/ca/capath"
 # ssh ${REMOTE_USER}@${REMOTE_IP1} "cd /opt/hpe/swarm-learning && scp $HOST_4_IP:/opt/hpe/swarm-learning/workspace/mnist/cert/ca/capath/ca-4-cert.pem /opt/hpe/swarm-learning/workspace/mnist/cert/ca/capath"
 # ssh ${REMOTE_USER}@${REMOTE_IP1} "cd /opt/hpe/swarm-learning && scp $HOST_5_IP:/opt/hpe/swarm-learning/workspace/mnist/cert/ca/capath/ca-5-cert.pem /opt/hpe/swarm-learning/workspace/mnist/cert/ca/capath"
 ssh ${REMOTE_USER}@${REMOTE_IP1} "git clone https://github.com/cyanexttime/SwarmLearningKLTN.git"
 # Host 2:
 ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning && scp $HOST_1_IP:/opt/hpe/swarm-learning/workspace/mnist/cert/ca/capath/ca-1-cert.pem /opt/hpe/swarm-learning/workspace/mnist/cert/ca/capath"
-# ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning && scp $HOST_3_IP:/opt/hpe/swarm-learning/workspace/mnist/cert/ca/capath/ca-3-cert.pem /opt/hpe/swarm-learning/workspace/mnist/cert/ca/capath"
+ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning && scp $HOST_3_IP:/opt/hpe/swarm-learning/workspace/mnist/cert/ca/capath/ca-3-cert.pem /opt/hpe/swarm-learning/workspace/mnist/cert/ca/capath"
 # ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning && scp $HOST_4_IP:/opt/hpe/swarm-learning/workspace/mnist/cert/ca/capath/ca-4-cert.pem /opt/hpe/swarm-learning/workspace/mnist/cert/ca/capath"
 # ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning && scp $HOST_5_IP:/opt/hpe/swarm-learning/workspace/mnist/cert/ca/capath/ca-5-cert.pem /opt/hpe/swarm-learning/workspace/mnist/cert/ca/capath"
 ssh ${REMOTE_USER}@${REMOTE_IP2} "git clone https://github.com/cyanexttime/SwarmLearningKLTN.git"
 # # Host 3:
-# ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning && scp $HOST_1_IP:/opt/hpe/swarm-learning/workspace/mnist/cert/ca/capath/ca-1-cert.pem /opt/hpe/swarm-learning/workspace/mnist/cert/ca/capath"
-# ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning && scp $HOST_2_IP:/opt/hpe/swarm-learning/workspace/mnist/cert/ca/capath/ca-2-cert.pem /opt/hpe/swarm-learning/workspace/mnist/cert/ca/capath"
+ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning && scp $HOST_1_IP:/opt/hpe/swarm-learning/workspace/mnist/cert/ca/capath/ca-1-cert.pem /opt/hpe/swarm-learning/workspace/mnist/cert/ca/capath"
+ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning && scp $HOST_2_IP:/opt/hpe/swarm-learning/workspace/mnist/cert/ca/capath/ca-2-cert.pem /opt/hpe/swarm-learning/workspace/mnist/cert/ca/capath"
 # ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning && scp $HOST_4_IP:/opt/hpe/swarm-learning/workspace/mnist/cert/ca/capath/ca-4-cert.pem /opt/hpe/swarm-learning/workspace/mnist/cert/ca/capath"
 # ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning && scp $HOST_5_IP:/opt/hpe/swarm-learning/workspace/mnist/cert/ca/capath/ca-5-cert.pem /opt/hpe/swarm-learning/workspace/mnist/cert/ca/capath"
-# ssh ${REMOTE_USER}@${REMOTE_IP3} "git clone https://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@github.com/PNg-HA/SwarmLearningKLTN.git"
+ssh ${REMOTE_USER}@${REMOTE_IP3} "git clone https://github.com/cyanexttime/SwarmLearningKLTN.git"
 # # Host 4:
 # ssh ${REMOTE_USER}@${REMOTE_IP4} "cd /opt/hpe/swarm-learning && scp $HOST_1_IP:/opt/hpe/swarm-learning/workspace/mnist/cert/ca/capath/ca-1-cert.pem /opt/hpe/swarm-learning/workspace/mnist/cert/ca/capath"
 # ssh ${REMOTE_USER}@${REMOTE_IP4} "cd /opt/hpe/swarm-learning && scp $HOST_2_IP:/opt/hpe/swarm-learning/workspace/mnist/cert/ca/capath/ca-2-cert.pem /opt/hpe/swarm-learning/workspace/mnist/cert/ca/capath"
@@ -162,12 +162,17 @@ case "$1" in
         # Scenario 1
         ssh ${REMOTE_USER}@${REMOTE_IP1} "cd /opt/hpe/swarm-learning/workspace/mnist && rm -r model"
         ssh ${REMOTE_USER}@${REMOTE_IP1} "cd SwarmLearningKLTN/custom_model && cp -r model swop swci /opt/hpe/swarm-learning/workspace/mnist/"
-        ssh ${REMOTE_USER}@${REMOTE_IP1} "cd /opt/hpe/swarm-learning/ && cp -r custom_dataset_new /opt/hpe/swarm-learning/workspace/mnist/"
+        ssh ${REMOTE_USER}@${REMOTE_IP1} "cd /opt/hpe/swarm-learning/ && cp -r custom_dataset_3_hosts /opt/hpe/swarm-learning/workspace/mnist/"
 
         ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning/workspace/mnist && rm -r model"
         ssh ${REMOTE_USER}@${REMOTE_IP2} "cd SwarmLearningKLTN/custom_model && cp -r model_h2 /opt/hpe/swarm-learning/workspace/mnist/model"
         ssh ${REMOTE_USER}@${REMOTE_IP2} "cd SwarmLearningKLTN/custom_model && cp -r swop swci /opt/hpe/swarm-learning/workspace/mnist/"
-        ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning/ && cp -r custom_dataset_new /opt/hpe/swarm-learning/workspace/mnist/"
+        ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning/ && cp -r custom_dataset_3_hosts /opt/hpe/swarm-learning/workspace/mnist/"
+
+        ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning/workspace/mnist && rm -r model"
+        ssh ${REMOTE_USER}@${REMOTE_IP3} "cd SwarmLearningKLTN/custom_model && cp -r model_h3 /opt/hpe/swarm-learning/workspace/mnist/model"
+        ssh ${REMOTE_USER}@${REMOTE_IP3} "cd SwarmLearningKLTN/custom_model && cp -r swop swci /opt/hpe/swarm-learning/workspace/mnist/"
+        ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning/ && cp -r custom_dataset_3_hosts /opt/hpe/swarm-learning/workspace/mnist/"
         ;;
     scenario2)
         # Scenario 2
@@ -272,8 +277,10 @@ esac
 ssh ${REMOTE_USER}@${REMOTE_IP1} "cd /opt/hpe/swarm-learning/ && sed -i \"s+<PROJECT-MODEL>+/opt/hpe/swarm-learning/workspace/mnist/model+g\" workspace/mnist/swci/taskdefs/swarm_mnist_task.yaml"
 ssh ${REMOTE_USER}@${REMOTE_IP1} "cd /opt/hpe/swarm-learning/ && sed -i \"s+<SWARM-NETWORK>+host-1-net+g\" workspace/mnist/swop/swop1_profile.yaml"
 ssh ${REMOTE_USER}@${REMOTE_IP1} "cd /opt/hpe/swarm-learning/ && sed -i \"s+<SWARM-NETWORK>+host-2-net+g\" workspace/mnist/swop/swop2_profile.yaml"
+ssh ${REMOTE_USER}@${REMOTE_IP1} "cd /opt/hpe/swarm-learning/ && sed -i \"s+<SWARM-NETWORK>+host-3-net+g\" workspace/mnist/swop/swop3_profile.yaml"
 ssh ${REMOTE_USER}@${REMOTE_IP1} "cd /opt/hpe/swarm-learning/ && sed -i \"s+<HOST_ADDRESS>+${HOST_1_IP}+g\" workspace/mnist/swop/swop1_profile.yaml"
 ssh ${REMOTE_USER}@${REMOTE_IP1} "cd /opt/hpe/swarm-learning/ && sed -i \"s+<HOST_ADDRESS>+${HOST_2_IP}+g\" workspace/mnist/swop/swop2_profile.yaml"
+ssh ${REMOTE_USER}@${REMOTE_IP1} "cd /opt/hpe/swarm-learning/ && sed -i \"s+<HOST_ADDRESS>+${HOST_3_IP}+g\" workspace/mnist/swop/swop3_profile.yaml"
 ssh ${REMOTE_USER}@${REMOTE_IP1} "cd /opt/hpe/swarm-learning/ && sed -i \"s+<LICENSE-SERVER-ADDRESS>+${APLS_IP}+g\" workspace/mnist/swop/swop*_profile.yaml"
 ssh ${REMOTE_USER}@${REMOTE_IP1} "cd /opt/hpe/swarm-learning/ && sed -i \"s+<PROJECT>+/opt/hpe/swarm-learning/workspace/mnist+g\" workspace/mnist/swop/swop*_profile.yaml"
 ssh ${REMOTE_USER}@${REMOTE_IP1} "cd /opt/hpe/swarm-learning/ && sed -i \"s+<PROJECT-CERTS>+/opt/hpe/swarm-learning/workspace/mnist/cert+g\" workspace/mnist/swop/swop*_profile.yaml"
@@ -288,8 +295,10 @@ ssh ${REMOTE_USER}@${REMOTE_IP1} "docker rm helper"
 ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning/ && sed -i \"s+<PROJECT-MODEL>+/opt/hpe/swarm-learning/workspace/mnist/model+g\" workspace/mnist/swci/taskdefs/swarm_mnist_task.yaml"
 ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning/ && sed -i \"s+<SWARM-NETWORK>+host-1-net+g\" workspace/mnist/swop/swop1_profile.yaml"
 ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning/ && sed -i \"s+<SWARM-NETWORK>+host-2-net+g\" workspace/mnist/swop/swop2_profile.yaml"
+ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning/ && sed -i \"s+<SWARM-NETWORK>+host-3-net+g\" workspace/mnist/swop/swop3_profile.yaml"
 ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning/ && sed -i \"s+<HOST_ADDRESS>+${HOST_1_IP}+g\" workspace/mnist/swop/swop1_profile.yaml"
 ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning/ && sed -i \"s+<HOST_ADDRESS>+${HOST_2_IP}+g\" workspace/mnist/swop/swop2_profile.yaml"
+ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning/ && sed -i \"s+<HOST_ADDRESS>+${HOST_3_IP}+g\" workspace/mnist/swop/swop3_profile.yaml"
 ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning/ && sed -i \"s+<LICENSE-SERVER-ADDRESS>+${APLS_IP}+g\" workspace/mnist/swop/swop*_profile.yaml"
 ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning/ && sed -i \"s+<PROJECT>+/opt/hpe/swarm-learning/workspace/mnist+g\" workspace/mnist/swop/swop*_profile.yaml"
 ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning/ && sed -i \"s+<PROJECT-CERTS>+/opt/hpe/swarm-learning/workspace/mnist/cert+g\" workspace/mnist/swop/swop*_profile.yaml"
@@ -300,21 +309,22 @@ ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning/ && docker volume c
 ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning/ && docker cp lib/swarmlearning-client-py3-none-manylinux_2_24_x86_64.whl helper:/data"
 ssh ${REMOTE_USER}@${REMOTE_IP2} "docker rm helper"
 
-# ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning/ && sed -i \"s+<PROJECT-MODEL>+/opt/hpe/swarm-learning/workspace/mnist/model+g\" workspace/mnist/swci/taskdefs/swarm_mnist_task.yaml"
-# ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning/ && sed -i \"s+<SWARM-NETWORK>+host-1-net+g\" workspace/mnist/swop/swop1_profile.yaml"
-# ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning/ && sed -i \"s+<SWARM-NETWORK>+host-2-net+g\" workspace/mnist/swop/swop2_profile.yaml"
-# ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning/ && sed -i \"s+<SWARM-NETWORK>+host-3-net+g\" workspace/mnist/swop/swop3_profile.yaml"
-# ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning/ && sed -i \"s+<HOST_ADDRESS>+${HOST_1_IP}+g\" workspace/mnist/swop/swop1_profile.yaml"
-# ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning/ && sed -i \"s+<HOST_ADDRESS>+${HOST_3_IP}+g\" workspace/mnist/swop/swop3_profile.yaml"
-# ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning/ && sed -i \"s+<LICENSE-SERVER-ADDRESS>+${APLS_IP}+g\" workspace/mnist/swop/swop*_profile.yaml"
-# ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning/ && sed -i \"s+<PROJECT>+/opt/hpe/swarm-learning/workspace/mnist+g\" workspace/mnist/swop/swop*_profile.yaml"
-# ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning/ && sed -i \"s+<PROJECT-CERTS>+/opt/hpe/swarm-learning/workspace/mnist/cert+g\" workspace/mnist/swop/swop*_profile.yaml"
-# ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning/ && sed -i \"s+<PROJECT-CACERTS>+/opt/hpe/swarm-learning/workspace/mnist/cert/ca/capath+g\" workspace/mnist/swop/swop*_profile.yaml"
-# ssh ${REMOTE_USER}@${REMOTE_IP3} "docker network create host-3-net"
-# ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning/ && docker volume rm sl-cli-lib"
-# ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning/ && docker volume create sl-cli-lib; docker container create --name helper -v sl-cli-lib:/data hello-world"
-# ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning/ && docker cp lib/swarmlearning-client-py3-none-manylinux_2_24_x86_64.whl helper:/data"
-# ssh ${REMOTE_USER}@${REMOTE_IP3} "docker rm helper"
+ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning/ && sed -i \"s+<PROJECT-MODEL>+/opt/hpe/swarm-learning/workspace/mnist/model+g\" workspace/mnist/swci/taskdefs/swarm_mnist_task.yaml"
+ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning/ && sed -i \"s+<SWARM-NETWORK>+host-1-net+g\" workspace/mnist/swop/swop1_profile.yaml"
+ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning/ && sed -i \"s+<SWARM-NETWORK>+host-2-net+g\" workspace/mnist/swop/swop2_profile.yaml"
+ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning/ && sed -i \"s+<SWARM-NETWORK>+host-3-net+g\" workspace/mnist/swop/swop3_profile.yaml"
+ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning/ && sed -i \"s+<HOST_ADDRESS>+${HOST_1_IP}+g\" workspace/mnist/swop/swop1_profile.yaml"
+ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning/ && sed -i \"s+<HOST_ADDRESS>+${HOST_2_IP}+g\" workspace/mnist/swop/swop2_profile.yaml"
+ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning/ && sed -i \"s+<HOST_ADDRESS>+${HOST_3_IP}+g\" workspace/mnist/swop/swop3_profile.yaml"
+ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning/ && sed -i \"s+<LICENSE-SERVER-ADDRESS>+${APLS_IP}+g\" workspace/mnist/swop/swop*_profile.yaml"
+ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning/ && sed -i \"s+<PROJECT>+/opt/hpe/swarm-learning/workspace/mnist+g\" workspace/mnist/swop/swop*_profile.yaml"
+ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning/ && sed -i \"s+<PROJECT-CERTS>+/opt/hpe/swarm-learning/workspace/mnist/cert+g\" workspace/mnist/swop/swop*_profile.yaml"
+ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning/ && sed -i \"s+<PROJECT-CACERTS>+/opt/hpe/swarm-learning/workspace/mnist/cert/ca/capath+g\" workspace/mnist/swop/swop*_profile.yaml"
+ssh ${REMOTE_USER}@${REMOTE_IP3} "docker network create host-3-net"
+ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning/ && docker volume rm sl-cli-lib"
+ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning/ && docker volume create sl-cli-lib; docker container create --name helper -v sl-cli-lib:/data hello-world"
+ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning/ && docker cp lib/swarmlearning-client-py3-none-manylinux_2_24_x86_64.whl helper:/data"
+ssh ${REMOTE_USER}@${REMOTE_IP3} "docker rm helper"
 
 # ssh ${REMOTE_USER}@${REMOTE_IP4} "cd /opt/hpe/swarm-learning/ && sed -i \"s+<PROJECT-MODEL>+/opt/hpe/swarm-learning/workspace/mnist/model+g\" workspace/mnist/swci/taskdefs/swarm_mnist_task.yaml"
 # ssh ${REMOTE_USER}@${REMOTE_IP4} "cd /opt/hpe/swarm-learning/ && sed -i \"s+<SWARM-NETWORK>+host-1-net+g\" workspace/mnist/swop/swop1_profile.yaml"
@@ -410,34 +420,35 @@ while true; do
     fi
 done
 
-# echo "sn3 start: ..."
-# ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning/ && ./scripts/bin/run-sn -d --rm --name=sn3 \
-# --network=host-3-net --host-ip=${HOST_3_IP} \
-# --sentinel-ip=${SN_1_IP} --sn-p2p-port=${SN_P2P_PORT} \
-# --sn-api-port=${SN_API_PORT} --key=workspace/mnist/cert/sn-3-key.pem \
-# --cert=workspace/mnist/cert/sn-3-cert.pem \
-# --capath=workspace/mnist/cert/ca/capath \
-# --apls-ip=${APLS_IP} \
-# --apls-port=443"
+
+echo "sn3 start: ..."
+ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning/ && ./scripts/bin/run-sn -d --rm --name=sn3 \
+--network=host-3-net --host-ip=${HOST_3_IP} \
+--sentinel-ip=${SN_1_IP} --sn-p2p-port=${SN_P2P_PORT} \
+--sn-api-port=${SN_API_PORT} --key=workspace/mnist/cert/sn-3-key.pem \
+--cert=workspace/mnist/cert/sn-3-cert.pem \
+--capath=workspace/mnist/cert/ca/capath \
+--apls-ip=${APLS_IP} \
+--apls-port=443"
 
 
-# sleep 90
-# # Function to check for the phrase in the docker logs
-# check_logs3() {
-#     ssh ${REMOTE_USER}@${REMOTE_IP3} "docker logs sn3" | grep --line-buffered "${SEARCH_PHRASE}" && return 0
-#     return 1
-# }
+sleep 90
+# Function to check for the phrase in the docker logs
+check_logs3() {
+    ssh ${REMOTE_USER}@${REMOTE_IP3} "docker logs sn3" | grep --line-buffered "${SEARCH_PHRASE}" && return 0
+    return 1
+}
 
-# # Loop until the phrase is found
-# while true; do
-#     if check_logs3; then
-#         echo "Phrase '${SEARCH_PHRASE}' found. Continuing script..."
-#         break
-#     else
-#         echo "Phrase '${SEARCH_PHRASE}' not found yet. Sleeping for 5 seconds..."
-#         sleep 5
-#     fi
-# done
+# Loop until the phrase is found
+while true; do
+    if check_logs3; then
+        echo "Phrase '${SEARCH_PHRASE}' found. Continuing script..."
+        break
+    else
+        echo "Phrase '${SEARCH_PHRASE}' not found yet. Sleeping for 5 seconds..."
+        sleep 5
+    fi
+done
 
 
 # echo "sn4 start: ..."
@@ -534,15 +545,15 @@ ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning/ && ./scripts/bin/r
 --apls-ip=${APLS_IP} \
 --apls-port=443"
 
-# echo "swop3 start: ..."
-# ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning/ && ./scripts/bin/run-swop -d --name=swop3 --network=host-3-net \
-# --sn-ip=${SN_3_IP} --sn-api-port=${SN_API_PORT} \
-# --usr-dir=workspace/mnist/swop --profile-file-name=swop3_profile.yaml \
-# --key=workspace/mnist/cert/swop-3-key.pem \
-# --cert=workspace/mnist/cert/swop-3-cert.pem \
-# --capath=workspace/mnist/cert/ca/capath -e SWOP_KEEP_CONTAINERS=True -e http_proxy= -e https_proxy= \
-# --apls-ip=${APLS_IP} \
-# --apls-port=443"
+echo "swop3 start: ..."
+ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning/ && ./scripts/bin/run-swop -d --name=swop3 --network=host-3-net \
+--sn-ip=${SN_3_IP} --sn-api-port=${SN_API_PORT} \
+--usr-dir=workspace/mnist/swop --profile-file-name=swop3_profile.yaml \
+--key=workspace/mnist/cert/swop-3-key.pem \
+--cert=workspace/mnist/cert/swop-3-cert.pem \
+--capath=workspace/mnist/cert/ca/capath -e SWOP_KEEP_CONTAINERS=True -e http_proxy= -e https_proxy= \
+--apls-ip=${APLS_IP} \
+--apls-port=443"
 
 # echo "swop4 start: ..."
 # ssh ${REMOTE_USER}@${REMOTE_IP4} "cd /opt/hpe/swarm-learning/ && ./scripts/bin/run-swop -d --name=swop4 --network=host-4-net \
@@ -583,7 +594,7 @@ ssh ${REMOTE_USER}@${REMOTE_IP1} "cd /opt/hpe/swarm-learning/ && ./scripts/bin/r
 
 ssh ${REMOTE_USER}@${REMOTE_IP1} "cd /opt/hpe/swarm-learning/ && sudo ./scripts/bin/swarmLogCollector "hub.myenterpriselicense.hpe.com/hpe/swarm-learning" "workspace=/opt/hpe/swarm-learning/workspace/mnist" && sudo mv /opt/logs/*swarm_log* ."
 ssh ${REMOTE_USER}@${REMOTE_IP2} "cd /opt/hpe/swarm-learning/ && sudo ./scripts/bin/swarmLogCollector "hub.myenterpriselicense.hpe.com/hpe/swarm-learning" "workspace=/opt/hpe/swarm-learning/workspace/mnist" && sudo mv /opt/logs/*swarm_log* ."
-# ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning/ && sudo ./scripts/bin/swarmLogCollector "hub.myenterpriselicense.hpe.com/hpe/swarm-learning" "workspace=/opt/hpe/swarm-learning/workspace/mnist" && sudo mv /opt/logs/*swarm_log* ."
+ssh ${REMOTE_USER}@${REMOTE_IP3} "cd /opt/hpe/swarm-learning/ && sudo ./scripts/bin/swarmLogCollector "hub.myenterpriselicense.hpe.com/hpe/swarm-learning" "workspace=/opt/hpe/swarm-learning/workspace/mnist" && sudo mv /opt/logs/*swarm_log* ."
 # ssh ${REMOTE_USER}@${REMOTE_IP4} "cd /opt/hpe/swarm-learning/ && sudo ./scripts/bin/swarmLogCollector "hub.myenterpriselicense.hpe.com/hpe/swarm-learning" "workspace=/opt/hpe/swarm-learning/workspace/mnist" && sudo mv /opt/logs/*swarm_log* ."
 # ssh ${REMOTE_USER}@${REMOTE_IP5} "cd /opt/hpe/swarm-learning/ && sudo ./scripts/bin/swarmLogCollector "hub.myenterpriselicense.hpe.com/hpe/swarm-learning" "workspace=/opt/hpe/swarm-learning/workspace/mnist" && sudo mv /opt/logs/*swarm_log* ."
 

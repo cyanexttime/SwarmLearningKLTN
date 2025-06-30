@@ -6,10 +6,11 @@ groupname: demo
 taskrunner: defaulttaskbb.taskdb.sml.hpe
 policyuri: ~
 resourcemgr:
-    mgrtype: DOCKER
-    accessinfo:
-      accesstype: FROMENV
-network: host-1-net
+  mgrtype: DOCKER
+  accessinfo:
+    accesstype: FROMENV
+network: host-3-net
+# apls, spiresrv , apisrv are defaulted to envvar not defined here
 apls:
   locator:
     host: <LICENSE-SERVER-ADDRESS>
@@ -34,14 +35,14 @@ nodes:
         - attribute:
             aType: KEY
             mType: BIND
-            src: "<PROJECT-CERTS>/sl-1-key.pem"
-            tgt: "/swarm-cert/sl-1-key.pem"
+            src: "<PROJECT-CERTS>/sl-3-key.pem"
+            tgt: "/swarm-cert/sl-3-key.pem"
             subPath: null
         - attribute:
             aType: CERT
             mType: BIND
-            src: "<PROJECT-CERTS>/sl-1-cert.pem"
-            tgt: "/swarm-cert/sl-1-cert.pem"
+            src: "<PROJECT-CERTS>/sl-3-cert.pem"
+            tgt: "/swarm-cert/sl-3-cert.pem"
             subPath: null
         - attribute:
             aType: CAPATH
@@ -49,12 +50,12 @@ nodes:
             src: "<PROJECT-CACERTS>"
             tgt: "/swarm-cert/capath"
             subPath: null
-      slhostname: sl1
+      slhostname: sl3
       slhostip: <HOST_ADDRESS>
-      slport: 16000
-      usrhostname: user1
+      slport: 18000
+      usrhostname: user3
       privatedata:
         src: "/opt/hpe/swarm-learning/workspace/mnist/custom_dataset_3_hosts"
         mType: BIND
       slenvvars: null
-      usrenvvars : [SCRATCH_DIR : "user1"]
+      usrenvvars: [SCRATCH_DIR : "user3"]
