@@ -49,20 +49,20 @@ class SyncLossLogger(Callback):
             self.sync_batches.append(self.batch_count)
 
 
-def GRU_model(input_size):
+# def GRU_model(input_size):
    
-    # Initialize the constructor
-    model = Sequential()
+#     # Initialize the constructor
+#     model = Sequential()
     
-    model.add(GRU(32, input_shape=(input_size,1), return_sequences=False)) #
-    model.add(Dropout(0.5))    
-    model.add(Dense(10, activation='relu'))
-    model.add(Dense(1, activation='sigmoid'))
+#     model.add(GRU(32, input_shape=(input_size,1), return_sequences=False)) #
+#     model.add(Dropout(0.5))    
+#     model.add(Dense(10, activation='relu'))
+#     model.add(Dense(1, activation='sigmoid'))
     
-    model.build()
-    print(model.summary())
+#     model.build()
+#     print(model.summary())
     
-    return model
+#     return model
 
 # def GRU_model(input_shape):
 
@@ -82,6 +82,24 @@ def GRU_model(input_size):
 #         X_seq.append(X[i:i + sequence_length])
 #         y_seq.append(y[i + sequence_length - 1])
 #     return np.array(X_seq), np.array(y_seq)
+
+def CNN_model(input_size):
+    model = Sequential()
+    model.add(Conv1D(filters=64, kernel_size=8, activation='relu', padding='same', input_shape=(input_size, 1)))
+    model.add(MaxPooling1D(2))
+    model.add(Conv1D(filters=32, kernel_size=5, activation='relu', padding='same'))
+    model.add(MaxPooling1D(2))
+    model.add(Conv1D(filters=16, kernel_size=3, activation='relu', padding='same'))
+    model.add(MaxPooling1D(2))
+
+    model.add(Dropout(0.5))
+    model.add(Flatten())
+    model.add(Dense(10, activation='relu'))
+    model.add(Dense(1, activation='sigmoid'))
+
+    model.build()
+    print(model.summary())
+    return model
 
 # compile and train learning model
 def compile_train(model, X_train, y_train, X_val, y_val, maxEpochs, swarm_callback=None, deep=True, plot_save_path=None):
@@ -440,25 +458,21 @@ def load_and_prepare_data(train_path, test_path, scaler_path):
 
 
 def train_and_evaluate(X_train, y_train, X_test, y_test, X_val, y_val, maxEpochs, minPeers, save_path, plot_save_path=None):
-    
     swarm_callback = SwarmCallback(
-        syncFrequency=1255,  # Number of training samples after which peers sync their model weights
-        minPeers=minPeers,  # Minimum number of active peers required to perform synchronization
-        useAdaptiveSync=False,  # Disable adaptive sync; use fixed sync frequency instead
-        adsValData=(format_3d(X_val), y_val),  # Validation data for Adaptive Sync and model merging decision
-        adsValBatchSize=512,  # Batch size for validation data during Adaptive Sync
-        mergeMethod='geomedian',  # Aggregation method to merge model weights from different peers
-        node_weightage=1,  # Equal weightage given to this node's model when averaging
-        logDir=os.path.join(
-        os.getenv('SCRATCH_DIR', '/platform/scratch'),'swarm_logs')  # Directory path to store Swarm logs
+        syncFrequency=1255,
+        minPeers=minPeers,
+        useAdaptiveSync=False,
+        adsValData=(format_3d(X_val), y_val),
+        adsValBatchSize=512,
+        mergeMethod='geomedian',
+        node_weightage=1,
+        logDir=os.path.join(os.getenv('SCRATCH_DIR', '/platform/scratch'), 'swarm_logs')
     )
 
-    # Set logging level for better visibility
     swarm_callback.logger.setLevel(logging.DEBUG)
 
-    model = GRU_model(X_train.shape[1])
+    model = CNN_model(X_train.shape[1])
     model = compile_train(model, format_3d(X_train), y_train, format_3d(X_val), y_val, maxEpochs, swarm_callback, deep=True, plot_save_path=plot_save_path)
-
 
     y_pred = model.predict(format_3d(X_test)).round()
     norm, atk = test_normal_atk(y_test, y_pred)
@@ -467,16 +481,15 @@ def train_and_evaluate(X_train, y_train, X_test, y_test, X_val, y_val, maxEpochs
     model.save(save_path)
     print(f"Model saved to {save_path}")
 
-    # Store results in a DataFrame
     results = pd.DataFrame([{
-        'Method': 'GRU',
+        'Method': 'CNN',
         'Accuracy': acc,
         'Precision': prec,
         'Recall': rec,
         'F1_Score': f1,
         'Normal_Detect_Rate': norm,
         'Atk_Detect_Rate': atk,
-    }])  
+    }])
     return results
 
 # def train_and_evaluate(X_train, y_train, X_test, y_test, X_val, y_val, maxEpochs, minPeers, save_path, plot_save_path=None):
