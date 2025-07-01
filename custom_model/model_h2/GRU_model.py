@@ -459,12 +459,12 @@ def load_and_prepare_data(train_path, test_path, scaler_path):
 
 def train_and_evaluate(X_train, y_train, X_test, y_test, X_val, y_val, maxEpochs, minPeers, save_path, plot_save_path=None):
     swarm_callback = SwarmCallback(
-        syncFrequency=1223,
+        syncFrequency=666,
         minPeers=minPeers,
         useAdaptiveSync=False,
         adsValData=(format_3d(X_val), y_val),
         adsValBatchSize=512,
-        mergeMethod='mean',
+        mergeMethod='geomedian',
         node_weightage=1,
         logDir=os.path.join(os.getenv('SCRATCH_DIR', '/platform/scratch'), 'swarm_logs')
     )
