@@ -118,7 +118,7 @@ def compile_train(model, X_train, y_train, X_val, y_val, maxEpochs, swarm_callba
             X_train, y_train,
             validation_data=(X_val, y_val) if X_val is not None and y_val is not None else None,
             epochs=maxEpochs,
-            batch_size=128,
+            batch_size=512,
             verbose=1,
             callbacks=callbacks
         )
