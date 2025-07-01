@@ -464,7 +464,7 @@ def train_and_evaluate(X_train, y_train, X_test, y_test, X_val, y_val, maxEpochs
         useAdaptiveSync=False,
         adsValData=(format_3d(X_val), y_val),
         adsValBatchSize=512,
-        mergeMethod='mean',
+        mergeMethod='geomedian',
         node_weightage=1,
         logDir=os.path.join(os.getenv('SCRATCH_DIR', '/platform/scratch'), 'swarm_logs')
     )
