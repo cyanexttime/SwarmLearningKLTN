@@ -363,77 +363,47 @@ def format_2d(df):
     X = np.array(df)
     return np.reshape(X, (X.shape[0], X.shape[1]))
 
-def load_and_prepare_data(train_path, test_path, scaler_path):
-    # Load full dataset
-    samples = pd.read_csv(train_path, sep=',')
-    X_train, X_val, y_train, y_val = train_test(samples)
-
-    # ==== UPSAMPLE TRAINING DATA ====
-    X = pd.concat([X_train, y_train], axis=1)
-    normal = X[X[' Label'] == 0]
-    ddos = X[X[' Label'] != 0]
-
-    normal_upsampled = resample(
-        normal,
-        replace=True,
-        n_samples=len(ddos),
-        random_state=27
-    )
-
-    upsampled = pd.concat([normal_upsampled, ddos])
-    X_train = upsampled.iloc[:, :-1]
-    y_train = upsampled.iloc[:, -1]
-
-    print("Counts after upsampling (train):")
-    print(y_train.value_counts())
-
-    # ==== UPSAMPLE VALIDATION DATA ====
-    val = pd.concat([X_val, y_val], axis=1)
-    val_normal = val[val[' Label'] == 0]
-    val_ddos = val[val[' Label'] != 0]
-
-    val_normal_upsampled = resample(
-        val_normal,
-        replace=True,
-        n_samples=len(val_ddos),
-        random_state=27
-    )
-
-    val_upsampled = pd.concat([val_normal_upsampled, val_ddos])
-    X_val = val_upsampled.iloc[:, :-1]
-    y_val = val_upsampled.iloc[:, -1]
-
-    print("Counts after upsampling (validation):")
-    print(y_val.value_counts())
-
-    # ==== TEST DATA ====
-    test_data = pd.read_csv(test_path, sep=',')
-    X_test = test_data.iloc[:, :-1]
-    y_test = test_data.iloc[:, -1]
-
-    print("Test set shape:", X_test.shape, y_test.shape)
-    print("Counts in final test set:")
-    print(y_test.value_counts())
-
-    print("Validation set shape:", X_val.shape, y_val.shape)
-    print("Counts in final validation set:")
-    print(y_val.value_counts())
-
-    # ==== NORMALIZATION ====
-    X_train, X_test, X_val = normalize_data(X_train, X_test, X_val, scaler_path)
-
-    return X_train, X_test, y_train, y_test, X_val, y_val
-
 # def load_and_prepare_data(train_path, test_path, scaler_path):
 #     # Load full dataset
 #     samples = pd.read_csv(train_path, sep=',')
 #     X_train, X_val, y_train, y_val = train_test(samples)
 
-#     # ==== NO UPSAMPLING ====
-#     print("Counts in training set:")
+#     # ==== UPSAMPLE TRAINING DATA ====
+#     X = pd.concat([X_train, y_train], axis=1)
+#     normal = X[X[' Label'] == 0]
+#     ddos = X[X[' Label'] != 0]
+
+#     normal_upsampled = resample(
+#         normal,
+#         replace=True,
+#         n_samples=len(ddos),
+#         random_state=27
+#     )
+
+#     upsampled = pd.concat([normal_upsampled, ddos])
+#     X_train = upsampled.iloc[:, :-1]
+#     y_train = upsampled.iloc[:, -1]
+
+#     print("Counts after upsampling (train):")
 #     print(y_train.value_counts())
 
-#     print("Counts in validation set:")
+#     # ==== UPSAMPLE VALIDATION DATA ====
+#     val = pd.concat([X_val, y_val], axis=1)
+#     val_normal = val[val[' Label'] == 0]
+#     val_ddos = val[val[' Label'] != 0]
+
+#     val_normal_upsampled = resample(
+#         val_normal,
+#         replace=True,
+#         n_samples=len(val_ddos),
+#         random_state=27
+#     )
+
+#     val_upsampled = pd.concat([val_normal_upsampled, val_ddos])
+#     X_val = val_upsampled.iloc[:, :-1]
+#     y_val = val_upsampled.iloc[:, -1]
+
+#     print("Counts after upsampling (validation):")
 #     print(y_val.value_counts())
 
 #     # ==== TEST DATA ====
@@ -454,6 +424,36 @@ def load_and_prepare_data(train_path, test_path, scaler_path):
 
 #     return X_train, X_test, y_train, y_test, X_val, y_val
 
+def load_and_prepare_data(train_path, test_path, scaler_path):
+    # Load full dataset
+    samples = pd.read_csv(train_path, sep=',')
+    X_train, X_val, y_train, y_val = train_test(samples)
+
+    # ==== NO UPSAMPLING ====
+    print("Counts in training set:")
+    print(y_train.value_counts())
+
+    print("Counts in validation set:")
+    print(y_val.value_counts())
+
+    # ==== TEST DATA ====
+    test_data = pd.read_csv(test_path, sep=',')
+    X_test = test_data.iloc[:, :-1]
+    y_test = test_data.iloc[:, -1]
+
+    print("Test set shape:", X_test.shape, y_test.shape)
+    print("Counts in final test set:")
+    print(y_test.value_counts())
+
+    print("Validation set shape:", X_val.shape, y_val.shape)
+    print("Counts in final validation set:")
+    print(y_val.value_counts())
+
+    # ==== NORMALIZATION ====
+    X_train, X_test, X_val = normalize_data(X_train, X_test, X_val, scaler_path)
+
+    return X_train, X_test, y_train, y_test, X_val, y_val
+
 
 
 
@@ -461,7 +461,7 @@ def train_and_evaluate(X_train, y_train, X_test, y_test, X_val, y_val, maxEpochs
     swarm_callback = SwarmCallback(
         syncFrequency=1223,
         minPeers=minPeers,
-        useAdaptiveSync=True,
+        useAdaptiveSync=False,
         adsValData=(format_3d(X_val), y_val),
         adsValBatchSize=512,
         mergeMethod='mean',
