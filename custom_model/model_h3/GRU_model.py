@@ -28,7 +28,7 @@ from swarmlearning.tf import SwarmCallback
 from tensorflow.keras.callbacks import History
 from tensorflow.keras.callbacks import Callback
 import tensorflow.keras.backend as K
-
+from tensorflow.keras.metrics import Recall
 
 #input_size
 # -> CIC-DDoS2019 82
@@ -124,132 +124,16 @@ def CNN_model(input_size):
     return model
 
 # # compile and train learning model
-# def compile_train(model, X_train, y_train, X_val, y_val, maxEpochs, swarm_callback=None, deep=True, plot_save_path=None):
-#     # Callbacks
-#     history_callback = History()
-#     sync_logger = SyncLossLogger(sync_freq=1024)
-#     if deep:
-#         model.compile(
-#             loss='binary_crossentropy',
-#             optimizer='adam',
-#             metrics=['accuracy']
-#         )
-        
-#         callbacks = [history_callback]
-#         if swarm_callback is not None:
-#             callbacks.append(swarm_callback)
-
-#         model.fit(
-#             X_train, y_train,
-#             validation_data=(X_val, y_val) if X_val is not None and y_val is not None else None,
-#             epochs=maxEpochs,
-#             batch_size=512,
-#             verbose=1,
-#             callbacks=callbacks
-#         )
-
-#         # Plotting training and validation metrics
-#         hist = history_callback.history
-#         print("History keys:", hist.keys())
-
-#         acc_key = 'accuracy'
-#         val_acc_key = 'val_accuracy'
-#         loss_key = 'loss'
-#         val_loss_key = 'val_loss'
-
-#         plt.figure(figsize=(12, 5))
-
-#         # Accuracy plot
-#         if acc_key in hist:
-#             plt.subplot(1, 2, 1)
-#             plt.plot(hist[acc_key], label='Training Accuracy')
-#             if val_acc_key in hist:
-#                 plt.plot(hist[val_acc_key], label='Validation Accuracy', linestyle='--')
-#             plt.title('Accuracy Over Epochs')
-#             plt.xlabel('Epoch')
-#             plt.ylabel('Accuracy')
-#             plt.legend()
-
-#             # Tick customization (manual)
-#             epochs = len(hist[acc_key])
-#             plt.xticks(np.arange(0, epochs + 1, step=1))  # x ticks every epoch
-#             plt.yticks(np.arange(0.9, 1.01, step=0.05))   # y ticks from 0.9 to 1.0 with step 0.05
-#             plt.ylim(0.9, 1.0)                            # y-axis limits between 0.9 and 1.0
-#         else:
-#             print("Accuracy key not found. Skipping accuracy plot.")
-
-#         # Loss plot
-#         if loss_key in hist:
-#             plt.subplot(1, 2, 2)
-#             plt.plot(hist[loss_key], label='Training Loss', color='orange')
-#             if val_loss_key in hist:
-#                 plt.plot(hist[val_loss_key], label='Validation Loss', color='red', linestyle='--')
-#             plt.title('Loss Over Epochs')
-#             plt.xlabel('Epoch')
-#             plt.ylabel('Loss')
-#             plt.legend()
-
-#             # Tick customization (manual)
-#             epochs = len(hist[loss_key])
-#             plt.xticks(np.arange(0, epochs + 1, step=1))   # x ticks every epoch
-
-#             max_loss = max(max(hist[loss_key]), max(hist.get(val_loss_key, [0])))
-#             plt.yticks(np.arange(0.0, 0.4, step=0.05))  # y ticks based on max loss
-#         else:
-#             print("Loss key not found. Skipping loss plot.")
-#             print(model.metrics_names)
-        
-#         if plot_save_path is not None:
-#             os.makedirs(plot_save_path, exist_ok=True)
-#             plot_path = os.path.join(plot_save_path, 'training_plots.png')
-#             plt.savefig(plot_path)
-#             print(f'Training plots saved to {plot_path}')
-#         else:
-#             plt.show()
-        
-#         if len(sync_logger.sync_losses) > 0:
-#             plt.figure(figsize=(6, 4))
-#             plt.plot(sync_logger.sync_batches, sync_logger.sync_losses, marker='o', linestyle='-', color='blue', label='Local Loss at Sync')
-#             plt.title('Local Loss at Each Swarm Sync Point')
-#             plt.xlabel('Batch Number')
-#             plt.ylabel('Loss')
-#             plt.grid(True)
-#             plt.legend()
-#             sync_loss_path = os.path.join(plot_save_path, 'sync_loss_plot.png') if plot_save_path else 'sync_loss_plot.png'
-#             plt.savefig(sync_loss_path)
-#             print(f'Sync loss plot saved to {sync_loss_path}')
-#             plt.close()
-
-#     else:
-#         model.fit(X_train, y_train)  # For non-deep models (e.g., SVM)
-
-#     print('Model Compiled and Trained')
-#     return model
-
-def CNN_model(input_size):
-    model = Sequential()
-    model.add(Conv1D(filters=64, kernel_size=8, activation='relu', padding='same', input_shape=(input_size, 1)))
-    model.add(MaxPooling1D(2))
-    model.add(Conv1D(filters=32, kernel_size=5, activation='relu', padding='same'))
-    model.add(MaxPooling1D(2))
-    model.add(Conv1D(filters=16, kernel_size=3, activation='relu', padding='same'))
-    model.add(MaxPooling1D(2))
-    model.add(Dropout(0.5))
-    model.add(Flatten())
-    model.add(Dense(10, activation='relu'))
-    model.add(Dense(1, activation='sigmoid'))
-    model.build()
-    print(model.summary())
-    return model
-
 def compile_train(model, X_train, y_train, X_val, y_val, maxEpochs, swarm_callback=None, deep=True, plot_save_path=None):
+    # Callbacks
     history_callback = History()
     sync_logger = SyncLossLogger(sync_freq=1024)
+
     if deep:
         model.compile(
-            loss=focal_loss(gamma=2., alpha=0.5),
+            loss='binary_crossentropy',
             optimizer='adam',
-            metrics=[f1_score_metric]
+            metrics=['accuracy', Recall()]
         )
 
         callbacks = [history_callback]
@@ -258,23 +142,27 @@ def compile_train(model, X_train, y_train, X_val, y_val, maxEpochs, swarm_callba
 
         model.fit(
             X_train, y_train,
-            validation_data=(X_val, y_val),
+            validation_data=(X_val, y_val) if X_val is not None and y_val is not None else None,
             epochs=maxEpochs,
-            batch_size=512,
+            batch_size=256,
             verbose=1,
             callbacks=callbacks
         )
 
+        # Plotting training and validation metrics
         hist = history_callback.history
+        print("History keys:", hist.keys())
+
         acc_key = 'accuracy'
         val_acc_key = 'val_accuracy'
         loss_key = 'loss'
         val_loss_key = 'val_loss'
-        f1_key = 'f1_score_metric'
-        val_f1_key = 'val_f1_score_metric'
+        recall_key = 'recall'
+        val_recall_key = 'val_recall'
 
         plt.figure(figsize=(18, 5))
 
+        # Accuracy plot
         if acc_key in hist:
             plt.subplot(1, 3, 1)
             plt.plot(hist[acc_key], label='Training Accuracy')
@@ -284,8 +172,13 @@ def compile_train(model, X_train, y_train, X_val, y_val, maxEpochs, swarm_callba
             plt.xlabel('Epoch')
             plt.ylabel('Accuracy')
             plt.legend()
-            plt.ylim(0.9, 1.0)
+            plt.xticks(np.arange(0, len(hist[acc_key]) + 1, step=1))
+            plt.yticks(np.arange(0.0, 1.05, step=0.1))
+            plt.ylim(0.0, 1.0)
+        else:
+            print("Accuracy key not found. Skipping accuracy plot.")
 
+        # Loss plot
         if loss_key in hist:
             plt.subplot(1, 3, 2)
             plt.plot(hist[loss_key], label='Training Loss', color='orange')
@@ -295,24 +188,36 @@ def compile_train(model, X_train, y_train, X_val, y_val, maxEpochs, swarm_callba
             plt.xlabel('Epoch')
             plt.ylabel('Loss')
             plt.legend()
+            plt.xticks(np.arange(0, len(hist[loss_key]) + 1, step=1))
+            plt.yticks(np.arange(0.0, 0.6, step=0.05))
+        else:
+            print("Loss key not found. Skipping loss plot.")
 
-        if f1_key in hist:
+        # Recall plot
+        if recall_key in hist:
             plt.subplot(1, 3, 3)
-            plt.plot(hist[f1_key], label='Training F1-Score', color='green')
-            if val_f1_key in hist:
-                plt.plot(hist[val_f1_key], label='Validation F1-Score', color='blue', linestyle='--')
-            plt.title('F1 Score Over Epochs')
+            plt.plot(hist[recall_key], label='Training Recall', color='green')
+            if val_recall_key in hist:
+                plt.plot(hist[val_recall_key], label='Validation Recall', color='purple', linestyle='--')
+            plt.title('Recall Over Epochs')
             plt.xlabel('Epoch')
-            plt.ylabel('F1 Score')
+            plt.ylabel('Recall')
             plt.legend()
-            plt.ylim(0.9, 1.0)
+            plt.xticks(np.arange(0, len(hist[recall_key]) + 1, step=1))
+            plt.yticks(np.arange(0.0, 1.05, step=0.1))
+            plt.ylim(0.0, 1.0)
+        else:
+            print("Recall key not found. Skipping recall plot.")
 
         if plot_save_path is not None:
             os.makedirs(plot_save_path, exist_ok=True)
-            plt.savefig(os.path.join(plot_save_path, 'training_metrics.png'))
+            plot_path = os.path.join(plot_save_path, 'training_plots.png')
+            plt.savefig(plot_path)
+            print(f'Training plots saved to {plot_path}')
         else:
             plt.show()
 
+        # Sync loss plot (if applicable)
         if len(sync_logger.sync_losses) > 0:
             plt.figure(figsize=(6, 4))
             plt.plot(sync_logger.sync_batches, sync_logger.sync_losses, marker='o', linestyle='-', color='blue', label='Local Loss at Sync')
@@ -323,13 +228,118 @@ def compile_train(model, X_train, y_train, X_val, y_val, maxEpochs, swarm_callba
             plt.legend()
             sync_loss_path = os.path.join(plot_save_path, 'sync_loss_plot.png') if plot_save_path else 'sync_loss_plot.png'
             plt.savefig(sync_loss_path)
+            print(f'Sync loss plot saved to {sync_loss_path}')
             plt.close()
-
     else:
-        model.fit(X_train, y_train)
+        model.fit(X_train, y_train)  # For non-deep models
 
     print('Model Compiled and Trained')
     return model
+
+# def CNN_model(input_size):
+#     model = Sequential()
+#     model.add(Conv1D(filters=64, kernel_size=8, activation='relu', padding='same', input_shape=(input_size, 1)))
+#     model.add(MaxPooling1D(2))
+#     model.add(Conv1D(filters=32, kernel_size=5, activation='relu', padding='same'))
+#     model.add(MaxPooling1D(2))
+#     model.add(Conv1D(filters=16, kernel_size=3, activation='relu', padding='same'))
+#     model.add(MaxPooling1D(2))
+#     model.add(Dropout(0.5))
+#     model.add(Flatten())
+#     model.add(Dense(10, activation='relu'))
+#     model.add(Dense(1, activation='sigmoid'))
+#     model.build()
+#     print(model.summary())
+#     return model
+
+# def compile_train(model, X_train, y_train, X_val, y_val, maxEpochs, swarm_callback=None, deep=True, plot_save_path=None):
+#     history_callback = History()
+#     sync_logger = SyncLossLogger(sync_freq=1024)
+#     if deep:
+#         model.compile(
+#             loss=focal_loss(gamma=2., alpha=0.5),
+#             optimizer='adam',
+#             metrics=[f1_score_metric]
+#         )
+
+#         callbacks = [history_callback]
+#         if swarm_callback is not None:
+#             callbacks.append(swarm_callback)
+
+#         model.fit(
+#             X_train, y_train,
+#             validation_data=(X_val, y_val),
+#             epochs=maxEpochs,
+#             batch_size=512,
+#             verbose=1,
+#             callbacks=callbacks
+#         )
+
+#         hist = history_callback.history
+#         acc_key = 'accuracy'
+#         val_acc_key = 'val_accuracy'
+#         loss_key = 'loss'
+#         val_loss_key = 'val_loss'
+#         f1_key = 'f1_score_metric'
+#         val_f1_key = 'val_f1_score_metric'
+
+#         plt.figure(figsize=(18, 5))
+
+#         if acc_key in hist:
+#             plt.subplot(1, 3, 1)
+#             plt.plot(hist[acc_key], label='Training Accuracy')
+#             if val_acc_key in hist:
+#                 plt.plot(hist[val_acc_key], label='Validation Accuracy', linestyle='--')
+#             plt.title('Accuracy Over Epochs')
+#             plt.xlabel('Epoch')
+#             plt.ylabel('Accuracy')
+#             plt.legend()
+#             plt.ylim(0.9, 1.0)
+
+#         if loss_key in hist:
+#             plt.subplot(1, 3, 2)
+#             plt.plot(hist[loss_key], label='Training Loss', color='orange')
+#             if val_loss_key in hist:
+#                 plt.plot(hist[val_loss_key], label='Validation Loss', color='red', linestyle='--')
+#             plt.title('Loss Over Epochs')
+#             plt.xlabel('Epoch')
+#             plt.ylabel('Loss')
+#             plt.legend()
+
+#         if f1_key in hist:
+#             plt.subplot(1, 3, 3)
+#             plt.plot(hist[f1_key], label='Training F1-Score', color='green')
+#             if val_f1_key in hist:
+#                 plt.plot(hist[val_f1_key], label='Validation F1-Score', color='blue', linestyle='--')
+#             plt.title('F1 Score Over Epochs')
+#             plt.xlabel('Epoch')
+#             plt.ylabel('F1 Score')
+#             plt.legend()
+#             plt.ylim(0.9, 1.0)
+
+#         if plot_save_path is not None:
+#             os.makedirs(plot_save_path, exist_ok=True)
+#             plt.savefig(os.path.join(plot_save_path, 'training_metrics.png'))
+#         else:
+#             plt.show()
+
+#         if len(sync_logger.sync_losses) > 0:
+#             plt.figure(figsize=(6, 4))
+#             plt.plot(sync_logger.sync_batches, sync_logger.sync_losses, marker='o', linestyle='-', color='blue', label='Local Loss at Sync')
+#             plt.title('Local Loss at Each Swarm Sync Point')
+#             plt.xlabel('Batch Number')
+#             plt.ylabel('Loss')
+#             plt.grid(True)
+#             plt.legend()
+#             sync_loss_path = os.path.join(plot_save_path, 'sync_loss_plot.png') if plot_save_path else 'sync_loss_plot.png'
+#             plt.savefig(sync_loss_path)
+#             plt.close()
+
+#     else:
+#         model.fit(X_train, y_train)
+
+#     print('Model Compiled and Trained')
+#     return model
 
 
 def testes(model, X_test, y_test, y_pred=None, deep=True, threshold=0.8):
@@ -587,7 +597,7 @@ def load_and_prepare_data(train_path, test_path, scaler_path):
 
 def train_and_evaluate(X_train, y_train, X_test, y_test, X_val, y_val, maxEpochs, minPeers, save_path, plot_save_path=None):
     swarm_callback = SwarmCallback(
-        syncFrequency=333,
+        syncFrequency=666,
         minPeers=minPeers,
         useAdaptiveSync=False,
         adsValData=(format_3d(X_val), y_val),
