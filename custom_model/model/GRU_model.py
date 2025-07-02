@@ -206,8 +206,8 @@ def compile_train(model, X_train, y_train, X_val, y_val, maxEpochs, swarm_callba
             plt.ylabel('Recall')
             plt.legend()
             plt.xticks(np.arange(0, len(hist[recall_key]) + 1, step=1))
-            plt.yticks(np.arange(0.9, 1.05, step=0.01))
-            plt.ylim(0.9, 1.0)
+            plt.yticks(np.arange(0.97, 1.05, step=0.005))
+            plt.ylim(0.97, 1.0)
         else:
             print("Recall key not found. Skipping recall plot.")
 
@@ -580,7 +580,7 @@ def load_and_prepare_data(train_path, test_path, scaler_path):
 
 def train_and_evaluate(X_train, y_train, X_test, y_test, X_val, y_val, maxEpochs, minPeers, save_path, plot_save_path=None):
     swarm_callback = SwarmCallback(
-        syncFrequency=1332,
+        syncFrequency=666,
         minPeers=minPeers,
         useAdaptiveSync=False,
         adsValData=(format_3d(X_val), y_val),
