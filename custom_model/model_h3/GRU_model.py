@@ -174,7 +174,7 @@ def compile_train(model, X_train, y_train, X_val, y_val, maxEpochs, swarm_callba
             plt.legend()
             plt.xticks(np.arange(0, len(hist[acc_key]) + 1, step=1))
             plt.yticks(np.arange(0.9, 1.05, step=0.01))
-            plt.ylim(0.0, 1.0)
+            plt.ylim(0.9, 1.0)
         else:
             print("Accuracy key not found. Skipping accuracy plot.")
 
@@ -205,7 +205,7 @@ def compile_train(model, X_train, y_train, X_val, y_val, maxEpochs, swarm_callba
             plt.legend()
             plt.xticks(np.arange(0, len(hist[recall_key]) + 1, step=1))
             plt.yticks(np.arange(0.9, 1.05, step=0.01))
-            plt.ylim(0.0, 1.0)
+            plt.ylim(0.9, 1.0)
         else:
             print("Recall key not found. Skipping recall plot.")
 
