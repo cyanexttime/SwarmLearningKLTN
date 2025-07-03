@@ -109,9 +109,9 @@ def f1_score_metric(y_true, y_pred):
 
 def CNN_model(input_size):
     model = Sequential()
-    model.add(Conv1D(filters=64, kernel_size=8, activation='relu', padding='same', input_shape=(input_size, 1)))
-    model.add(MaxPooling1D(2))
-    model.add(Conv1D(filters=32, kernel_size=5, activation='relu', padding='same'))
+    # model.add(Conv1D(filters=64, kernel_size=8, activation='relu', padding='same', input_shape=(input_size, 1)))
+    # model.add(MaxPooling1D(2))
+    model.add(Conv1D(filters=32, kernel_size=5, activation='relu', padding='same', input_shape=(input_size, 1)))
     model.add(MaxPooling1D(2))
     model.add(Conv1D(filters=16, kernel_size=3, activation='relu', padding='same'))
     model.add(MaxPooling1D(2))
